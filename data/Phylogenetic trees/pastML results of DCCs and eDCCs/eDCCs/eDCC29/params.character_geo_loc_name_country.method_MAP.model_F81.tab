@@ -1,0 +1,15 @@
+parameter	value
+pastml_version	1.9.34
+character	geo_loc_name_country
+log_likelihood	-4.485199138986696
+log_likelihood_restricted_MAP	-6.187703323503483
+method	MAP
+model	F81
+num_nodes	15
+num_tips	8
+scaling_factor	0.03723977106230376
+smoothing_factor	0
+state_changes_per_avg_branch	0.20894659390600628
+China	0.2838567198267031
+Ireland	0.32933688436727365
+UK	0.38680639580602333

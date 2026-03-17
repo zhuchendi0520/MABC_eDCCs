@@ -1,0 +1,8 @@
+#NEXUS
+Begin Taxa;
+ Dimensions NTax=8;
+ TaxLabels SRR13083203 ERR1081289 ERR115030 ERR119095 ERR115081 ERR3198399 ERR567866 ERR7253800;
+End;
+Begin Trees;
+ Tree tree1=(SRR13083203:57.77670[&date=57.776714,geo_loc_name_country=UK],(ERR1081289:15.12300[&date=37.307604,geo_loc_name_country=UK],((ERR115030:0.00011[&date=33.591513,geo_loc_name_country=UK],ERR119095:0.00011[&date=33.591513,geo_loc_name_country=UK])Node_1:11.40670[&date=33.591408,geo_loc_name_country=UK],((ERR115081:5.17445[&date=40.842864,geo_loc_name_country=UK],(ERR3198399:0.00011[&date=40.066084,geo_loc_name_country=UK],ERR567866:0.00011[&date=40.066084,geo_loc_name_country=UK])Node_2:4.39757[&date=40.065979,geo_loc_name_country=UK])Node_3:0.00011[&date=35.668413,geo_loc_name_country=UK],ERR7253800:22.10840[&date=57.776712,geo_loc_name_country=Germany])Node_4:13.48360[&date=35.668308,geo_loc_name_country=UK])Node_5:0.00011[&date=22.184715,geo_loc_name_country=UK])Node_6:22.18460[&date=22.18461,geo_loc_name_country=UK])Node_7:0.00000[&date=0,geo_loc_name_country=UK];
+End;

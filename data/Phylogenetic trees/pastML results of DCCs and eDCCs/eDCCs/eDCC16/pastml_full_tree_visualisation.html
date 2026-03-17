@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: helvetica,serif;
+  font-size: 14px;
+}
+
+#cy {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+}
+
+h1 {
+  opacity: 0.5;
+  font-size: 1em;
+}
+
+.floating {
+    max-width: 30%;
+    width: 120px;
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.cy-button {
+    background-color: #555555;
+    border: none;
+    color: white;
+    padding: 6px 0px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+a.cy-button:link, a.cy-button:visited, a.cy-button:hover {
+    color: white;
+    text-decoration: none;
+}
+
+
+.slidertext {
+    width: 100%;
+    color: #555555;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    text-align: center;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    margin: 10px 0px;
+    display: inline-block;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+@media all and (max-width: 600px) {
+    .buttontext {
+        display: none;
+    }
+}
+
+
+</style>
+<meta charset=utf-8 />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+<title>d386e7a5-a19b-43bd-91cb-6291e5787ffb.full</title>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.qtip.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-qtip.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-svg.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/layout-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cose-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-cose-bilkent.min.js"></script>
+    
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/jquery.qtip.min.css"/>
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/bootstrap.min.css"/>
+    
+<meta http-Equiv="Cache-Control" Content="no-cache" />
+<meta http-Equiv="Pragma" Content="no-cache" />
+<meta http-Equiv="Expires" Content="0" />
+</head>
+<body>
+<div id="fullscreenDiv">
+<div id="cy"></div>
+<div class="floating">
+    <a class="cy-button" href="#" id="fit" onclick="fit()">
+        <span class="glyphicon glyphicon-resize-full"></span><span class="buttontext">  Fit screen</span>
+    </a>
+    <a class="cy-button" href="#" id="reset" onclick="resetLayout()">
+        <span class="glyphicon glyphicon-picture"></span><span class="buttontext">  Restore layout</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader" onclick="toImage()" download="d386e7a5-a19b-43bd-91cb-6291e5787ffb.full.jpg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (jpg)</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader_svg" onclick="saveAsSvg()" download="d386e7a5-a19b-43bd-91cb-6291e5787ffb.full.svg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (svg)</span>
+    </a>
+    <a class="cy-button" href="#" id="fullscreen" onclick="toggleFullScreen()">
+        <span id="fsspan" class="glyphicon glyphicon-fullscreen"></span><span id="fstext" class="buttontext">  Full screen</span>
+    </a>
+    
+<div class="slidecontainer">
+  <input type="range" min="0" max="8" value="8" class="slider" id="myRange" step="1">
+  <div class="slidertext">dist. to root: <span id="demo"></span></div>
+</div>
+</div></div>
+<!-- Load appplication code at the end to ensure DOM is loaded -->
+<script type="text/javascript">var layoutOptions = {
+  name: 'preset',
+  positions: function(node){
+    node.position('x', node.data('node_x'));
+    node.position('y', node.data('node_y'));
+    return node.position();
+  },
+  fit: true, // whether to fit to viewport
+  padding: 1, // padding on fit
+};
+
+
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+
+  style: cytoscape.stylesheet()
+    .selector('node')
+      .css({
+        'width': 300,
+        'height': 300,
+        'content': '',
+        'shape': 'barrel',
+        'pie-size': '100%',
+        'background-color': '#909090',
+        'color': '#383838',
+        'text-opacity': 1,
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-size': 80,
+        'text-halign' : 'center',
+        'text-valign' : 'center',
+        'min-zoomed-font-size': 12,
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': .3,
+        'text-background-padding' : 1,
+      })
+    .selector('node[node_name]')
+      .css({
+        'content': 'data(node_name)',
+      })
+    .selector('node[tip]')
+      .css({
+        'width': 500,
+        'height': 500,
+        'font-size': 100,
+        'shape': 'ellipse',
+      })
+    .selector('node[unresolved]')
+      .css({
+        'shape': 'octagon',
+        'pie-size': '90%',
+        'width': 600,
+        'height': 600,
+        'font-size': 150,
+      })
+    .selector('node[fake]')
+      .css({
+        'shape': 'rectangle',
+        'width': 1,
+        'height': 1,
+        'text-opacity': 0,
+        'font-size': 1,
+        'text-background-opacity': 0,
+        'text-background-padding' : 0,
+        'opacity': 0,
+      })
+    .selector('node[hidden>0]')
+      .css({
+        'opacity': 0.1,
+        'width': 100,
+        'height': 100,
+      })
+    
+    .selector(".Australia")
+        .css({
+        
+                'pie-1-background-color': "#a6cee3",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Canada")
+        .css({
+        
+                'pie-1-background-color': "#1f78b4",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Germany")
+        .css({
+        
+                'pie-1-background-color': "#b2df8a",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Ireland")
+        .css({
+        
+                'pie-1-background-color': "#33a02c",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Japan")
+        .css({
+        
+                'pie-1-background-color': "#fb9a99",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Norway")
+        .css({
+        
+                'pie-1-background-color': "#e31a1c",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".UK")
+        .css({
+        
+                'pie-1-background-color': "#fdbf6f",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".USA")
+        .css({
+        
+                'pie-1-background-color': "#ff7f00",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector('edge')
+      .css({
+        'width': 100,
+        'font-size': 100,
+        'color': 'black',
+        'content': '',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'target-arrow-color': '#909090',
+        'opacity': 1,
+        'text-opacity': 1,
+        'line-color': '#909090',
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': 1,
+        'text-background-padding' : 4,
+        'min-zoomed-font-size': 10,
+        'line-style': 'solid',
+        'line-dash-pattern': [200, 20],
+      })
+    .selector('edge[polytomy]')
+      .css({
+        'line-style': 'dashed',
+      })
+    .selector('edge[fake]')
+      .css({
+        'target-arrow-shape': 'none',
+      })
+    .selector('edge[edge_name]')
+      .css({
+        'content': 'data(edge_name)',
+      })
+    .selector('edge[edge_color]')
+      .css({
+        'target-arrow-color': 'data(edge_color)',
+        'line-color': 'data(edge_color)',
+        'width': 80,
+      })
+    .selector(':selected')
+      .css({
+        'background-color': 'black',
+        'line-color': 'black',
+        'target-arrow-color': 'black',
+        'source-arrow-color': 'black',
+        'pie-size': '60%',
+        'opacity': 1
+      })
+    .selector('.faded')
+      .css({
+        'opacity': 0.25,
+        'text-opacity': 0
+      }),
+
+  elements: {'nodes': [{'data': {'id': 'fake_node_0', 'fake': 1, 'node_x': 12754.39453125, 'node_y': 0.0}}, {'data': {'node_root_date': 0, 'node_name': 'root', 'node_root_id': 'root', 'mile': 0, 'id': 0, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 12754.39453125, 'node_y': 0.0}, 'classes': 'USA'}, {'data': {'id': 'fake_node_1', 'fake': 1, 'node_x': 300.0, 'node_y': 0.0}}, {'data': {'id': 'fake_node_2', 'fake': 1, 'node_x': 25208.7890625, 'node_y': 0.0}}, {'data': {'node_root_date': 40.887753, 'node_name': 'n0', 'node_root_id': 'n0', 'mile': 3, 'id': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 300.0, 'node_y': 11031.690127051224}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_3', 'fake': 1, 'node_x': 0, 'node_y': 11031.690127051224}}, {'data': {'id': 'fake_node_4', 'fake': 1, 'node_x': 600, 'node_y': 11031.690127051224}}, {'data': {'node_root_date': 6.100135, 'node_name': 'n00', 'node_root_id': 'n00', 'mile': 0, 'id': 2, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 25208.7890625, 'node_y': 1645.842437298514}, 'classes': 'USA'}, {'data': {'id': 'fake_node_5', 'fake': 1, 'node_x': 16099.21875, 'node_y': 1645.842437298514}}, {'data': {'id': 'fake_node_6', 'fake': 1, 'node_x': 34318.359375, 'node_y': 1645.842437298514}}, {'data': {'node_root_date': 40.888774999999995, 'node_name': 'SRR6871406', 'node_root_id': 'SRR6871406', 'mile': 3, 'id': 3, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 0, 'node_y': 11031.965867009589}, 'classes': 'Australia'}, {'data': {'node_root_date': 45.927947999999994, 'node_name': 'SRR6871398', 'node_root_id': 'SRR6871398', 'mile': 4, 'id': 4, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 600, 'node_y': 12391.556232188206}, 'classes': 'Australia'}, {'data': {'node_root_date': 9.055697, 'node_name': 'n1', 'node_root_id': 'n1', 'mile': 0, 'id': 5, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 16099.21875, 'node_y': 2443.26566902484}, 'classes': 'USA'}, {'data': {'id': 'fake_node_7', 'fake': 1, 'node_x': 6698.4375, 'node_y': 2443.26566902484}}, {'data': {'id': 'fake_node_8', 'fake': 1, 'node_x': 25500.0, 'node_y': 2443.26566902484}}, {'data': {'node_root_date': 20.40959, 'node_name': 'n2222', 'node_root_id': 'n2222', 'mile': 4, 'id': 6, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 34318.359375, 'node_y': 5506.5944196093005}, 'classes': 'UK'}, {'data': {'id': 'fake_node_9', 'fake': 1, 'node_x': 29186.71875, 'node_y': 5506.5944196093005}}, {'data': {'id': 'fake_node_10', 'fake': 1, 'node_x': 39450.0, 'node_y': 5506.5944196093005}}, {'data': {'node_root_date': 12.072171, 'node_name': 'n11', 'node_root_id': 'n11', 'mile': 0, 'id': 7, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 6698.4375, 'node_y': 3257.123218113114}, 'classes': 'USA'}, {'data': {'id': 'fake_node_11', 'fake': 1, 'node_x': 1781.25, 'node_y': 3257.123218113114}}, {'data': {'id': 'fake_node_12', 'fake': 1, 'node_x': 11615.625, 'node_y': 3257.123218113114}}, {'data': {'node_root_date': 42.169249, 'node_name': 'n2121', 'node_root_id': 'n2121', 'mile': 4, 'id': 8, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 25500.0, 'node_y': 11377.443212848228}, 'classes': 'Germany'}, {'data': {'id': 'fake_node_13', 'fake': 1, 'node_x': 25200, 'node_y': 11377.443212848228}}, {'data': {'id': 'fake_node_14', 'fake': 1, 'node_x': 25800, 'node_y': 11377.443212848228}}, {'data': {'node_root_date': 20.410612, 'node_name': 'n23', 'node_root_id': 'n23', 'mile': 4, 'id': 9, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 29186.71875, 'node_y': 5506.870159567665}, 'classes': 'UK'}, {'data': {'id': 'fake_node_15', 'fake': 1, 'node_x': 27300.0, 'node_y': 5506.870159567665}}, {'data': {'id': 'fake_node_16', 'fake': 1, 'node_x': 31073.4375, 'node_y': 5506.870159567665}}, {'data': {'node_root_date': 58.434000000000005, 'node_name': 'n3333', 'node_root_id': 'n3333', 'mile': 6, 'id': 10, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 39450.0, 'node_y': 15765.74239440625}, 'classes': 'UK'}, {'data': {'id': 'fake_node_17', 'fake': 1, 'node_x': 39000, 'node_y': 15765.74239440625}}, {'data': {'id': 'fake_node_18', 'fake': 1, 'node_x': 39900.0, 'node_y': 15765.74239440625}}, {'data': {'node_root_date': 12.073193000000002, 'node_name': 'n2', 'node_root_id': 'n2', 'mile': 2, 'id': 11, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 1781.25, 'node_y': 3257.398958071479}, 'classes': 'USA'}, {'data': {'id': 'fake_node_19', 'fake': 1, 'node_x': 1200, 'node_y': 3257.398958071479}}, {'data': {'id': 'fake_node_20', 'fake': 1, 'node_x': 2362.5, 'node_y': 3257.398958071479}}, {'data': {'node_root_date': 12.073193000000002, 'node_name': 'n44', 'node_root_id': 'n44', 'mile': 0, 'id': 12, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 11615.625, 'node_y': 3257.398958071479}, 'classes': 'USA'}, {'data': {'id': 'fake_node_21', 'fake': 1, 'node_x': 6562.5, 'node_y': 3257.398958071479}}, {'data': {'id': 'fake_node_22', 'fake': 1, 'node_x': 16668.75, 'node_y': 3257.398958071479}}, {'data': {'node_root_date': 43.146071, 'node_name': 'ERR7253823', 'node_root_id': 'ERR7253823', 'mile': 4, 'id': 13, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 25200, 'node_y': 11640.993954149331}, 'classes': 'Germany'}, {'data': {'node_root_date': 45.232614, 'node_name': 'ERR7253825', 'node_root_id': 'ERR7253825', 'mile': 4, 'id': 14, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 25800, 'node_y': 12203.952153705268}, 'classes': 'Germany'}, {'data': {'node_root_date': 26.342556000000002, 'node_name': 'n2323', 'node_root_id': 'n2323', 'mile': 4, 'id': 15, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 27300.0, 'node_y': 7107.333947808138}, 'classes': 'UK'}, {'data': {'id': 'fake_node_23', 'fake': 1, 'node_x': 26700.0, 'node_y': 7107.333947808138}}, {'data': {'id': 'fake_node_24', 'fake': 1, 'node_x': 27900.0, 'node_y': 7107.333947808138}}, {'data': {'node_root_date': 42.165924000000004, 'node_name': 'n25', 'node_root_id': 'n25', 'mile': 6, 'id': 16, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 31073.4375, 'node_y': 11376.546113668617}, 'classes': 'UK'}, {'data': {'id': 'fake_node_25', 'fake': 1, 'node_x': 28800, 'node_y': 11376.546113668617}}, {'data': {'id': 'fake_node_26', 'fake': 1, 'node_x': 33346.875, 'node_y': 11376.546113668617}}, {'data': {'node_root_date': 65.759529, 'node_name': 'ERR494842', 'node_root_id': 'ERR494842', 'mile': 6, 'id': 17, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 39000, 'node_y': 17742.201358652277}, 'classes': 'UK'}, {'data': {'node_root_date': 66.598118, 'node_name': 'n34', 'node_root_id': 'n34', 'mile': 7, 'id': 18, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 39900.0, 'node_y': 17968.45624705257}, 'classes': 'UK'}, {'data': {'id': 'fake_node_27', 'fake': 1, 'node_x': 39600, 'node_y': 17968.45624705257}}, {'data': {'id': 'fake_node_28', 'fake': 1, 'node_x': 40200, 'node_y': 17968.45624705257}}, {'data': {'node_root_date': 36.611166000000004, 'node_name': 'DRR317401', 'node_root_id': 'DRR317401', 'mile': 3, 'id': 19, 'tip': 1, 'tooltip': 'geo_loc_name_country: Japan', 'node_x': 1200, 'node_y': 9877.84871675471}, 'classes': 'Japan'}, {'data': {'node_root_date': 31.337140000000005, 'node_name': 'n22', 'node_root_id': 'n22', 'mile': 2, 'id': 20, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2362.5, 'node_y': 8454.894010634971}, 'classes': 'USA'}, {'data': {'id': 'fake_node_29', 'fake': 1, 'node_x': 1800, 'node_y': 8454.894010634971}}, {'data': {'id': 'fake_node_30', 'fake': 1, 'node_x': 2925.0, 'node_y': 8454.894010634971}}, {'data': {'node_root_date': 23.910012000000002, 'node_name': 'n5', 'node_root_id': 'n5', 'mile': 2, 'id': 21, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 6562.5, 'node_y': 6451.023202915463}, 'classes': 'USA'}, {'data': {'id': 'fake_node_31', 'fake': 1, 'node_x': 5925.0, 'node_y': 6451.023202915463}}, {'data': {'id': 'fake_node_32', 'fake': 1, 'node_x': 7200, 'node_y': 6451.023202915463}}, {'data': {'node_root_date': 12.074215000000002, 'node_name': 'n7', 'node_root_id': 'n7', 'mile': 0, 'id': 22, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 16668.75, 'node_y': 3257.6746980298435}, 'classes': 'USA'}, {'data': {'id': 'fake_node_33', 'fake': 1, 'node_x': 10875.0, 'node_y': 3257.6746980298435}}, {'data': {'id': 'fake_node_34', 'fake': 1, 'node_x': 22462.5, 'node_y': 3257.6746980298435}}, {'data': {'node_root_date': 55.25555, 'node_name': 'n24', 'node_root_id': 'n24', 'mile': 5, 'id': 23, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 26700.0, 'node_y': 14908.183029764079}, 'classes': 'UK'}, {'data': {'id': 'fake_node_35', 'fake': 1, 'node_x': 26400, 'node_y': 14908.183029764079}}, {'data': {'id': 'fake_node_36', 'fake': 1, 'node_x': 27000, 'node_y': 14908.183029764079}}, {'data': {'node_root_date': 48.109169, 'node_name': 'n2424', 'node_root_id': 'n2424', 'mile': 4, 'id': 24, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 27900.0, 'node_y': 12980.05895990271}, 'classes': 'UK'}, {'data': {'id': 'fake_node_37', 'fake': 1, 'node_x': 27600, 'node_y': 12980.05895990271}}, {'data': {'id': 'fake_node_38', 'fake': 1, 'node_x': 28200, 'node_y': 12980.05895990271}}, {'data': {'node_root_date': 59.557154000000004, 'node_name': 'ERR5413286', 'node_root_id': 'ERR5413286', 'mile': 6, 'id': 25, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 28800, 'node_y': 16068.774133346713}, 'classes': 'UK'}, {'data': {'node_root_date': 51.11153, 'node_name': 'n2525', 'node_root_id': 'n2525', 'mile': 6, 'id': 26, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 33346.875, 'node_y': 13790.108761405463}, 'classes': 'UK'}, {'data': {'id': 'fake_node_39', 'fake': 1, 'node_x': 31012.5, 'node_y': 13790.108761405463}}, {'data': {'id': 'fake_node_40', 'fake': 1, 'node_x': 35681.25, 'node_y': 13790.108761405463}}, {'data': {'node_root_date': 66.59914, 'node_name': 'ERR5413403', 'node_root_id': 'ERR5413403', 'mile': 7, 'id': 27, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 39600, 'node_y': 17968.731987010935}, 'classes': 'UK'}, {'data': {'node_root_date': 66.59914, 'node_name': 'SRR6388764', 'node_root_id': 'SRR6388764', 'mile': 7, 'id': 28, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 40200, 'node_y': 17968.731987010935}, 'classes': 'UK'}, {'data': {'node_root_date': 35.338765, 'node_name': 'SRR26728048', 'node_root_id': 'SRR26728048', 'mile': 3, 'id': 29, 'tip': 1, 'tooltip': 'geo_loc_name_country: Canada', 'node_x': 1800, 'node_y': 9534.549500743742}, 'classes': 'Canada'}, {'data': {'node_root_date': 31.338162000000004, 'node_name': 'n3', 'node_root_id': 'n3', 'mile': 2, 'id': 30, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2925.0, 'node_y': 8455.169750593335}, 'classes': 'USA'}, {'data': {'id': 'fake_node_41', 'fake': 1, 'node_x': 2400, 'node_y': 8455.169750593335}}, {'data': {'id': 'fake_node_42', 'fake': 1, 'node_x': 3450.0, 'node_y': 8455.169750593335}}, {'data': {'node_root_date': 32.450378, 'node_name': 'n55', 'node_root_id': 'n55', 'mile': 2, 'id': 31, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 5925.0, 'node_y': 8755.250370488207}, 'classes': 'USA'}, {'data': {'id': 'fake_node_43', 'fake': 1, 'node_x': 5250.0, 'node_y': 8755.250370488207}}, {'data': {'id': 'fake_node_44', 'fake': 1, 'node_x': 6600, 'node_y': 8755.250370488207}}, {'data': {'node_root_date': 41.29745, 'node_name': 'SRR7800558', 'node_root_id': 'SRR7800558', 'mile': 4, 'id': 32, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 7200, 'node_y': 11142.228124822403}, 'classes': 'USA'}, {'data': {'node_root_date': 13.078737000000002, 'node_name': 'n77', 'node_root_id': 'n77', 'mile': 0, 'id': 33, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 10875.0, 'node_y': 3528.6990174588364}, 'classes': 'USA'}, {'data': {'id': 'fake_node_45', 'fake': 1, 'node_x': 8100.0, 'node_y': 3528.6990174588364}}, {'data': {'id': 'fake_node_46', 'fake': 1, 'node_x': 13650.0, 'node_y': 3528.6990174588364}}, {'data': {'node_root_date': 25.297729000000004, 'node_name': 'n1818', 'node_root_id': 'n1818', 'mile': 1, 'id': 34, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 22462.5, 'node_y': 6825.435167496671}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_47', 'fake': 1, 'node_x': 21300.0, 'node_y': 6825.435167496671}}, {'data': {'id': 'fake_node_48', 'fake': 1, 'node_x': 23625.0, 'node_y': 6825.435167496671}}, {'data': {'node_root_date': 55.256572, 'node_name': 'ERR5412853', 'node_root_id': 'ERR5412853', 'mile': 5, 'id': 35, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 26400, 'node_y': 14908.458769722443}, 'classes': 'UK'}, {'data': {'node_root_date': 55.256572, 'node_name': 'ERR5412497', 'node_root_id': 'ERR5412497', 'mile': 5, 'id': 36, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 27000, 'node_y': 14908.458769722443}, 'classes': 'UK'}, {'data': {'node_root_date': 48.110191, 'node_name': 'ERR5412862', 'node_root_id': 'ERR5412862', 'mile': 4, 'id': 37, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 27600, 'node_y': 12980.334699861074}, 'classes': 'UK'}, {'data': {'node_root_date': 48.110191, 'node_name': 'ERR5413635', 'node_root_id': 'ERR5413635', 'mile': 4, 'id': 38, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 28200, 'node_y': 12980.334699861074}, 'classes': 'UK'}, {'data': {'node_root_date': 55.091274, 'node_name': 'n26', 'node_root_id': 'n26', 'mile': 7, 'id': 39, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 31012.5, 'node_y': 14863.86066440173}, 'classes': 'UK'}, {'data': {'id': 'fake_node_49', 'fake': 1, 'node_x': 29925.0, 'node_y': 14863.86066440173}}, {'data': {'id': 'fake_node_50', 'fake': 1, 'node_x': 32100.0, 'node_y': 14863.86066440173}}, {'data': {'node_root_date': 51.112552, 'node_name': 'n2828', 'node_root_id': 'n2828', 'mile': 6, 'id': 40, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 35681.25, 'node_y': 13790.384501363827}, 'classes': 'UK'}, {'data': {'id': 'fake_node_51', 'fake': 1, 'node_x': 34087.5, 'node_y': 13790.384501363827}}, {'data': {'id': 'fake_node_52', 'fake': 1, 'node_x': 37275.0, 'node_y': 13790.384501363827}}, {'data': {'node_root_date': 37.356992000000005, 'node_name': 'SRR32028574', 'node_root_id': 'SRR32028574', 'mile': 3, 'id': 41, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2400, 'node_y': 10079.075752163042}, 'classes': 'USA'}, {'data': {'node_root_date': 31.339184000000003, 'node_name': 'n33', 'node_root_id': 'n33', 'mile': 2, 'id': 42, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3450.0, 'node_y': 8455.4454905517}, 'classes': 'USA'}, {'data': {'id': 'fake_node_53', 'fake': 1, 'node_x': 3000, 'node_y': 8455.4454905517}}, {'data': {'id': 'fake_node_54', 'fake': 1, 'node_x': 3900.0, 'node_y': 8455.4454905517}}, {'data': {'node_root_date': 32.4514, 'node_name': 'n6', 'node_root_id': 'n6', 'mile': 2, 'id': 43, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 5250.0, 'node_y': 8755.526110446572}, 'classes': 'USA'}, {'data': {'id': 'fake_node_55', 'fake': 1, 'node_x': 4800, 'node_y': 8755.526110446572}}, {'data': {'id': 'fake_node_56', 'fake': 1, 'node_x': 5700.0, 'node_y': 8755.526110446572}}, {'data': {'node_root_date': 33.457364, 'node_name': 'SRR7800550', 'node_root_id': 'SRR7800550', 'mile': 2, 'id': 44, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 6600, 'node_y': 9026.939487625037}, 'classes': 'USA'}, {'data': {'node_root_date': 55.574785000000006, 'node_name': 'n8', 'node_root_id': 'n8', 'mile': 5, 'id': 45, 'tooltip': 'geo_loc_name_country: Canada', 'node_x': 8100.0, 'node_y': 14994.313994156015}, 'classes': 'Canada'}, {'data': {'id': 'fake_node_57', 'fake': 1, 'node_x': 7800, 'node_y': 14994.313994156015}}, {'data': {'id': 'fake_node_58', 'fake': 1, 'node_x': 8400, 'node_y': 14994.313994156015}}, {'data': {'node_root_date': 13.079759000000003, 'node_name': 'n88', 'node_root_id': 'n88', 'mile': 0, 'id': 46, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 13650.0, 'node_y': 3528.974757417201}, 'classes': 'USA'}, {'data': {'id': 'fake_node_59', 'fake': 1, 'node_x': 10443.75, 'node_y': 3528.974757417201}}, {'data': {'id': 'fake_node_60', 'fake': 1, 'node_x': 16856.25, 'node_y': 3528.974757417201}}, {'data': {'node_root_date': 27.296990000000005, 'node_name': 'n19', 'node_root_id': 'n19', 'mile': 1, 'id': 47, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 21300.0, 'node_y': 7364.844311234615}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_61', 'fake': 1, 'node_x': 21000, 'node_y': 7364.844311234615}}, {'data': {'id': 'fake_node_62', 'fake': 1, 'node_x': 21600, 'node_y': 7364.844311234615}}, {'data': {'node_root_date': 27.313489000000004, 'node_name': 'n1919', 'node_root_id': 'n1919', 'mile': 1, 'id': 48, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 23625.0, 'node_y': 7369.2958117953385}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_63', 'fake': 1, 'node_x': 22950.0, 'node_y': 7369.2958117953385}}, {'data': {'id': 'fake_node_64', 'fake': 1, 'node_x': 24300.0, 'node_y': 7369.2958117953385}}, {'data': {'node_root_date': 65.24851, 'node_name': 'n2626', 'node_root_id': 'n2626', 'mile': 7, 'id': 49, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 29925.0, 'node_y': 17604.326253188898}, 'classes': 'UK'}, {'data': {'id': 'fake_node_65', 'fake': 1, 'node_x': 29400, 'node_y': 17604.326253188898}}, {'data': {'id': 'fake_node_66', 'fake': 1, 'node_x': 30450.0, 'node_y': 17604.326253188898}}, {'data': {'node_root_date': 72.262687, 'node_name': 'n28', 'node_root_id': 'n28', 'mile': 8, 'id': 50, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 32100.0, 'node_y': 19496.781120060397}, 'classes': 'Germany'}, {'data': {'id': 'fake_node_67', 'fake': 1, 'node_x': 31800, 'node_y': 19496.781120060397}}, {'data': {'id': 'fake_node_68', 'fake': 1, 'node_x': 32400, 'node_y': 19496.781120060397}}, {'data': {'node_root_date': 67.312007, 'node_name': 'n29', 'node_root_id': 'n29', 'mile': 7, 'id': 51, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 34087.5, 'node_y': 18161.066543664136}, 'classes': 'UK'}, {'data': {'id': 'fake_node_69', 'fake': 1, 'node_x': 33300.0, 'node_y': 18161.066543664136}}, {'data': {'id': 'fake_node_70', 'fake': 1, 'node_x': 34875.0, 'node_y': 18161.066543664136}}, {'data': {'node_root_date': 55.614332000000005, 'node_name': 'n3131', 'node_root_id': 'n3131', 'mile': 6, 'id': 52, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 37275.0, 'node_y': 15004.983943405965}, 'classes': 'Ireland'}, {'data': {'id': 'fake_node_71', 'fake': 1, 'node_x': 36600, 'node_y': 15004.983943405965}}, {'data': {'id': 'fake_node_72', 'fake': 1, 'node_x': 37950.0, 'node_y': 15004.983943405965}}, {'data': {'node_root_date': 34.337528000000006, 'node_name': 'SRR32028613', 'node_root_id': 'SRR32028613', 'mile': 3, 'id': 53, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3000, 'node_y': 9264.41148832378}, 'classes': 'USA'}, {'data': {'node_root_date': 34.336012000000004, 'node_name': 'n4', 'node_root_id': 'n4', 'mile': 2, 'id': 54, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3900.0, 'node_y': 9264.00246505873}, 'classes': 'USA'}, {'data': {'id': 'fake_node_73', 'fake': 1, 'node_x': 3600, 'node_y': 9264.00246505873}}, {'data': {'id': 'fake_node_74', 'fake': 1, 'node_x': 4200, 'node_y': 9264.00246505873}}, {'data': {'node_root_date': 32.452422, 'node_name': 'SRR7800547', 'node_root_id': 'SRR7800547', 'mile': 2, 'id': 55, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 4800, 'node_y': 8755.801850404936}, 'classes': 'USA'}, {'data': {'node_root_date': 32.452422, 'node_name': 'n66', 'node_root_id': 'n66', 'mile': 2, 'id': 56, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 5700.0, 'node_y': 8755.801850404936}, 'classes': 'USA'}, {'data': {'id': 'fake_node_75', 'fake': 1, 'node_x': 5400, 'node_y': 8755.801850404936}}, {'data': {'id': 'fake_node_76', 'fake': 1, 'node_x': 6000, 'node_y': 8755.801850404936}}, {'data': {'node_root_date': 55.575807000000005, 'node_name': 'SRR26728016', 'node_root_id': 'SRR26728016', 'mile': 5, 'id': 57, 'tip': 1, 'tooltip': 'geo_loc_name_country: Canada', 'node_x': 7800, 'node_y': 14994.58973411438}, 'classes': 'Canada'}, {'data': {'node_root_date': 55.575807000000005, 'node_name': 'SRR26728018', 'node_root_id': 'SRR26728018', 'mile': 5, 'id': 58, 'tip': 1, 'tooltip': 'geo_loc_name_country: Canada', 'node_x': 8400, 'node_y': 14994.58973411438}, 'classes': 'Canada'}, {'data': {'node_root_date': 15.085036000000002, 'node_name': 'n9', 'node_root_id': 'n9', 'mile': 3, 'id': 59, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 10443.75, 'node_y': 4070.007043610646}, 'classes': 'USA'}, {'data': {'id': 'fake_node_77', 'fake': 1, 'node_x': 9000, 'node_y': 4070.007043610646}}, {'data': {'id': 'fake_node_78', 'fake': 1, 'node_x': 11887.5, 'node_y': 4070.007043610646}}, {'data': {'node_root_date': 18.122778000000004, 'node_name': 'n14', 'node_root_id': 'n14', 'mile': 0, 'id': 60, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 16856.25, 'node_y': 4889.602789797257}, 'classes': 'UK'}, {'data': {'id': 'fake_node_79', 'fake': 1, 'node_x': 15000, 'node_y': 4889.602789797257}}, {'data': {'id': 'fake_node_80', 'fake': 1, 'node_x': 18712.5, 'node_y': 4889.602789797257}}, {'data': {'node_root_date': 27.298012000000003, 'node_name': 'ERR459815', 'node_root_id': 'ERR459815', 'mile': 1, 'id': 61, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 21000, 'node_y': 7365.120051192979}, 'classes': 'Australia'}, {'data': {'node_root_date': 27.298012000000003, 'node_name': 'ERR459817', 'node_root_id': 'ERR459817', 'mile': 1, 'id': 62, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 21600, 'node_y': 7365.120051192979}, 'classes': 'Australia'}, {'data': {'node_root_date': 27.314511000000003, 'node_name': 'n20', 'node_root_id': 'n20', 'mile': 1, 'id': 63, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 22950.0, 'node_y': 7369.571551753703}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_81', 'fake': 1, 'node_x': 22500.0, 'node_y': 7369.571551753703}}, {'data': {'id': 'fake_node_82', 'fake': 1, 'node_x': 23400, 'node_y': 7369.571551753703}}, {'data': {'node_root_date': 27.314511000000003, 'node_name': 'n21', 'node_root_id': 'n21', 'mile': 1, 'id': 64, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 24300.0, 'node_y': 7369.571551753703}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_83', 'fake': 1, 'node_x': 24000, 'node_y': 7369.571551753703}}, {'data': {'id': 'fake_node_84', 'fake': 1, 'node_x': 24600, 'node_y': 7369.571551753703}}, {'data': {'node_root_date': 68.248959, 'node_name': 'ERR5413168', 'node_root_id': 'ERR5413168', 'mile': 7, 'id': 65, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 29400, 'node_y': 18413.860188937844}, 'classes': 'UK'}, {'data': {'node_root_date': 67.26077699999999, 'node_name': 'n27', 'node_root_id': 'n27', 'mile': 7, 'id': 66, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 30450.0, 'node_y': 18147.24447119151}, 'classes': 'UK'}, {'data': {'id': 'fake_node_85', 'fake': 1, 'node_x': 30000, 'node_y': 18147.24447119151}}, {'data': {'id': 'fake_node_86', 'fake': 1, 'node_x': 30900.0, 'node_y': 18147.24447119151}}, {'data': {'node_root_date': 72.263709, 'node_name': 'ERR7253712', 'node_root_id': 'ERR7253712', 'mile': 8, 'id': 67, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 31800, 'node_y': 19497.056860018765}, 'classes': 'Germany'}, {'data': {'node_root_date': 72.263709, 'node_name': 'ERR5671701', 'node_root_id': 'ERR5671701', 'mile': 8, 'id': 68, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 32400, 'node_y': 19497.056860018765}, 'classes': 'Germany'}, {'data': {'node_root_date': 71.321715, 'node_name': 'n2929', 'node_root_id': 'n2929', 'mile': 8, 'id': 69, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 33300.0, 'node_y': 19242.902861643222}, 'classes': 'UK'}, {'data': {'id': 'fake_node_87', 'fake': 1, 'node_x': 33000, 'node_y': 19242.902861643222}}, {'data': {'id': 'fake_node_88', 'fake': 1, 'node_x': 33600, 'node_y': 19242.902861643222}}, {'data': {'node_root_date': 71.319824, 'node_name': 'n30', 'node_root_id': 'n30', 'mile': 7, 'id': 70, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 34875.0, 'node_y': 19242.39266177897}, 'classes': 'UK'}, {'data': {'id': 'fake_node_89', 'fake': 1, 'node_x': 34200, 'node_y': 19242.39266177897}}, {'data': {'id': 'fake_node_90', 'fake': 1, 'node_x': 35550.0, 'node_y': 19242.39266177897}}, {'data': {'node_root_date': 55.615354, 'node_name': 'ERR4020111', 'node_root_id': 'ERR4020111', 'mile': 6, 'id': 71, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 36600, 'node_y': 15005.25968336433}, 'classes': 'Ireland'}, {'data': {'node_root_date': 55.615354, 'node_name': 'n32', 'node_root_id': 'n32', 'mile': 6, 'id': 72, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 37950.0, 'node_y': 15005.25968336433}, 'classes': 'Ireland'}, {'data': {'id': 'fake_node_91', 'fake': 1, 'node_x': 37500.0, 'node_y': 15005.25968336433}}, {'data': {'id': 'fake_node_92', 'fake': 1, 'node_x': 38400, 'node_y': 15005.25968336433}}, {'data': {'node_root_date': 34.337034, 'node_name': 'SRR32028571', 'node_root_id': 'SRR32028571', 'mile': 2, 'id': 73, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3600, 'node_y': 9264.278205017094}, 'classes': 'USA'}, {'data': {'node_root_date': 34.337034, 'node_name': 'SRR32028610', 'node_root_id': 'SRR32028610', 'mile': 2, 'id': 74, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 4200, 'node_y': 9264.278205017094}, 'classes': 'USA'}, {'data': {'node_root_date': 33.461352, 'node_name': 'SRR7800548', 'node_root_id': 'SRR7800548', 'mile': 2, 'id': 75, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 5400, 'node_y': 9028.01546703204}, 'classes': 'USA'}, {'data': {'node_root_date': 32.453444, 'node_name': 'SRR7800559', 'node_root_id': 'SRR7800559', 'mile': 2, 'id': 76, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 6000, 'node_y': 8756.0775903633}, 'classes': 'USA'}, {'data': {'node_root_date': 35.817507000000006, 'node_name': 'ERR5384783', 'node_root_id': 'ERR5384783', 'mile': 3, 'id': 77, 'tip': 1, 'tooltip': 'geo_loc_name_country: Norway', 'node_x': 9000, 'node_y': 9663.716133960412}, 'classes': 'Norway'}, {'data': {'node_root_date': 17.109212000000003, 'node_name': 'n99', 'node_root_id': 'n99', 'mile': 4, 'id': 78, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 11887.5, 'node_y': 4616.138360599723}, 'classes': 'USA'}, {'data': {'id': 'fake_node_93', 'fake': 1, 'node_x': 10500.0, 'node_y': 4616.138360599723}}, {'data': {'id': 'fake_node_94', 'fake': 1, 'node_x': 13275.0, 'node_y': 4616.138360599723}}, {'data': {'node_root_date': 43.686791, 'node_name': 'ERR7253827', 'node_root_id': 'ERR7253827', 'mile': 4, 'id': 79, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 15000, 'node_y': 11786.882516073953}, 'classes': 'Germany'}, {'data': {'node_root_date': 18.123800000000003, 'node_name': 'n1414', 'node_root_id': 'n1414', 'mile': 0, 'id': 80, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 18712.5, 'node_y': 4889.878529755622}, 'classes': 'UK'}, {'data': {'id': 'fake_node_95', 'fake': 1, 'node_x': 17325.0, 'node_y': 4889.878529755622}}, {'data': {'id': 'fake_node_96', 'fake': 1, 'node_x': 20100.0, 'node_y': 4889.878529755622}}, {'data': {'node_root_date': 31.333238, 'node_name': 'n2020', 'node_root_id': 'n2020', 'mile': 2, 'id': 81, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 22500.0, 'node_y': 8453.841234394717}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_97', 'fake': 1, 'node_x': 22200, 'node_y': 8453.841234394717}}, {'data': {'id': 'fake_node_98', 'fake': 1, 'node_x': 22800, 'node_y': 8453.841234394717}}, {'data': {'node_root_date': 27.315533000000002, 'node_name': 'ERR459819', 'node_root_id': 'ERR459819', 'mile': 1, 'id': 82, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 23400, 'node_y': 7369.847291712067}, 'classes': 'Australia'}, {'data': {'node_root_date': 27.315533000000002, 'node_name': 'ERR494957', 'node_root_id': 'ERR494957', 'mile': 1, 'id': 83, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 24000, 'node_y': 7369.847291712067}, 'classes': 'Australia'}, {'data': {'node_root_date': 27.315533000000002, 'node_name': 'ERR459818', 'node_root_id': 'ERR459818', 'mile': 1, 'id': 84, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 24600, 'node_y': 7369.847291712067}, 'classes': 'Australia'}, {'data': {'node_root_date': 67.261799, 'node_name': 'ERR5413391', 'node_root_id': 'ERR5413391', 'mile': 7, 'id': 85, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 30000, 'node_y': 18147.520211149877}, 'classes': 'UK'}, {'data': {'node_root_date': 70.257849, 'node_name': 'n2727', 'node_root_id': 'n2727', 'mile': 7, 'id': 86, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 30900.0, 'node_y': 18955.867277939087}, 'classes': 'UK'}, {'data': {'id': 'fake_node_99', 'fake': 1, 'node_x': 30600, 'node_y': 18955.867277939087}}, {'data': {'id': 'fake_node_100', 'fake': 1, 'node_x': 31200, 'node_y': 18955.867277939087}}, {'data': {'node_root_date': 71.322737, 'node_name': 'ERR5413267', 'node_root_id': 'ERR5413267', 'mile': 8, 'id': 87, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 33000, 'node_y': 19243.178601601587}, 'classes': 'UK'}, {'data': {'node_root_date': 71.322737, 'node_name': 'SRR6045518', 'node_root_id': 'SRR6045518', 'mile': 8, 'id': 88, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 33600, 'node_y': 19243.178601601587}, 'classes': 'UK'}, {'data': {'node_root_date': 71.320846, 'node_name': 'ERR5413505', 'node_root_id': 'ERR5413505', 'mile': 7, 'id': 89, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 34200, 'node_y': 19242.668401737334}, 'classes': 'UK'}, {'data': {'node_root_date': 71.320846, 'node_name': 'n3030', 'node_root_id': 'n3030', 'mile': 7, 'id': 90, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 35550.0, 'node_y': 19242.668401737334}, 'classes': 'UK'}, {'data': {'id': 'fake_node_101', 'fake': 1, 'node_x': 35100.0, 'node_y': 19242.668401737334}}, {'data': {'id': 'fake_node_102', 'fake': 1, 'node_x': 36000, 'node_y': 19242.668401737334}}, {'data': {'node_root_date': 60.116682000000004, 'node_name': 'n3232', 'node_root_id': 'n3232', 'mile': 6, 'id': 91, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 37500.0, 'node_y': 16219.737173878892}, 'classes': 'Ireland'}, {'data': {'id': 'fake_node_103', 'fake': 1, 'node_x': 37200, 'node_y': 16219.737173878892}}, {'data': {'id': 'fake_node_104', 'fake': 1, 'node_x': 37800, 'node_y': 16219.737173878892}}, {'data': {'node_root_date': 55.616376, 'node_name': 'ERR4020070', 'node_root_id': 'ERR4020070', 'mile': 6, 'id': 92, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 38400, 'node_y': 15005.535423322694}, 'classes': 'Ireland'}, {'data': {'node_root_date': 17.110234000000002, 'node_name': 'n10', 'node_root_id': 'n10', 'mile': 6, 'id': 93, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 10500.0, 'node_y': 4616.414100558087}, 'classes': 'USA'}, {'data': {'id': 'fake_node_105', 'fake': 1, 'node_x': 9900.0, 'node_y': 4616.414100558087}}, {'data': {'id': 'fake_node_106', 'fake': 1, 'node_x': 11100.0, 'node_y': 4616.414100558087}}, {'data': {'node_root_date': 17.110234000000002, 'node_name': 'n12', 'node_root_id': 'n12', 'mile': 4, 'id': 94, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 13275.0, 'node_y': 4616.414100558087}, 'classes': 'USA'}, {'data': {'id': 'fake_node_107', 'fake': 1, 'node_x': 12450.0, 'node_y': 4616.414100558087}}, {'data': {'id': 'fake_node_108', 'fake': 1, 'node_x': 14100.0, 'node_y': 4616.414100558087}}, {'data': {'node_root_date': 26.199423000000003, 'node_name': 'n15', 'node_root_id': 'n15', 'mile': 0, 'id': 95, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 17325.0, 'node_y': 7068.716054011059}, 'classes': 'UK'}, {'data': {'id': 'fake_node_109', 'fake': 1, 'node_x': 16350.0, 'node_y': 7068.716054011059}}, {'data': {'id': 'fake_node_110', 'fake': 1, 'node_x': 18300.0, 'node_y': 7068.716054011059}}, {'data': {'node_root_date': 41.97224800000001, 'node_name': 'n18', 'node_root_id': 'n18', 'mile': 5, 'id': 96, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 20100.0, 'node_y': 11324.291502928654}, 'classes': 'Germany'}, {'data': {'id': 'fake_node_111', 'fake': 1, 'node_x': 19800, 'node_y': 11324.291502928654}}, {'data': {'id': 'fake_node_112', 'fake': 1, 'node_x': 20400, 'node_y': 11324.291502928654}}, {'data': {'node_root_date': 31.33426, 'node_name': 'ERR459820', 'node_root_id': 'ERR459820', 'mile': 2, 'id': 97, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 22200, 'node_y': 8454.11697435308}, 'classes': 'Australia'}, {'data': {'node_root_date': 31.33426, 'node_name': 'ERR459821', 'node_root_id': 'ERR459821', 'mile': 2, 'id': 98, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 22800, 'node_y': 8454.11697435308}, 'classes': 'Australia'}, {'data': {'node_root_date': 70.258871, 'node_name': 'ERR5413382', 'node_root_id': 'ERR5413382', 'mile': 7, 'id': 99, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 30600, 'node_y': 18956.14301789745}, 'classes': 'UK'}, {'data': {'node_root_date': 70.258871, 'node_name': 'ERR5412016', 'node_root_id': 'ERR5412016', 'mile': 7, 'id': 100, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 31200, 'node_y': 18956.14301789745}, 'classes': 'UK'}, {'data': {'node_root_date': 71.32186800000001, 'node_name': 'n31', 'node_root_id': 'n31', 'mile': 8, 'id': 101, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 35100.0, 'node_y': 19242.9441416957}, 'classes': 'UK'}, {'data': {'id': 'fake_node_113', 'fake': 1, 'node_x': 34800, 'node_y': 19242.9441416957}}, {'data': {'id': 'fake_node_114', 'fake': 1, 'node_x': 35400, 'node_y': 19242.9441416957}}, {'data': {'node_root_date': 71.32186800000001, 'node_name': 'SRR6046296', 'node_root_id': 'SRR6046296', 'mile': 7, 'id': 102, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 36000, 'node_y': 19242.9441416957}, 'classes': 'UK'}, {'data': {'node_root_date': 60.117704, 'node_name': 'ERR337733', 'node_root_id': 'ERR337733', 'mile': 6, 'id': 103, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 37200, 'node_y': 16220.012913837256}, 'classes': 'Ireland'}, {'data': {'node_root_date': 60.117704, 'node_name': 'ERR363323', 'node_root_id': 'ERR363323', 'mile': 6, 'id': 104, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 37800, 'node_y': 16220.012913837256}, 'classes': 'Ireland'}, {'data': {'node_root_date': 59.779561, 'node_name': 'n1010', 'node_root_id': 'n1010', 'mile': 6, 'id': 105, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 9900.0, 'node_y': 16128.780490411309}, 'classes': 'USA'}, {'data': {'id': 'fake_node_115', 'fake': 1, 'node_x': 9600, 'node_y': 16128.780490411309}}, {'data': {'id': 'fake_node_116', 'fake': 1, 'node_x': 10200, 'node_y': 16128.780490411309}}, {'data': {'node_root_date': 75.609347, 'node_name': 'n1111', 'node_root_id': 'n1111', 'mile': 8, 'id': 106, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 11100.0, 'node_y': 20399.724260041636}, 'classes': 'UK'}, {'data': {'id': 'fake_node_117', 'fake': 1, 'node_x': 10800, 'node_y': 20399.724260041636}}, {'data': {'id': 'fake_node_118', 'fake': 1, 'node_x': 11400, 'node_y': 20399.724260041636}}, {'data': {'node_root_date': 48.769958, 'node_name': 'n1212', 'node_root_id': 'n1212', 'mile': 5, 'id': 107, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 12450.0, 'node_y': 13158.342650066952}, 'classes': 'UK'}, {'data': {'id': 'fake_node_119', 'fake': 1, 'node_x': 12000, 'node_y': 13158.342650066952}}, {'data': {'id': 'fake_node_120', 'fake': 1, 'node_x': 12900.0, 'node_y': 13158.342650066952}}, {'data': {'node_root_date': 22.128593000000002, 'node_name': 'n1313', 'node_root_id': 'n1313', 'mile': 4, 'id': 108, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 14100.0, 'node_y': 5970.388759774471}, 'classes': 'USA'}, {'data': {'id': 'fake_node_121', 'fake': 1, 'node_x': 13800, 'node_y': 5970.388759774471}}, {'data': {'id': 'fake_node_122', 'fake': 1, 'node_x': 14400, 'node_y': 5970.388759774471}}, {'data': {'node_root_date': 26.200445000000002, 'node_name': 'n1515', 'node_root_id': 'n1515', 'mile': 0, 'id': 109, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 16350.0, 'node_y': 7068.991793969423}, 'classes': 'UK'}, {'data': {'id': 'fake_node_123', 'fake': 1, 'node_x': 15900.0, 'node_y': 7068.991793969423}}, {'data': {'id': 'fake_node_124', 'fake': 1, 'node_x': 16800, 'node_y': 7068.991793969423}}, {'data': {'node_root_date': 26.200445000000002, 'node_name': 'n1616', 'node_root_id': 'n1616', 'mile': 1, 'id': 110, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 18300.0, 'node_y': 7068.991793969423}, 'classes': 'UK'}, {'data': {'id': 'fake_node_125', 'fake': 1, 'node_x': 17700.0, 'node_y': 7068.991793969423}}, {'data': {'id': 'fake_node_126', 'fake': 1, 'node_x': 18900.0, 'node_y': 7068.991793969423}}, {'data': {'node_root_date': 59.47975900000001, 'node_name': 'ERR7253727', 'node_root_id': 'ERR7253727', 'mile': 6, 'id': 111, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 19800, 'node_y': 16047.892632292274}, 'classes': 'Germany'}, {'data': {'node_root_date': 51.97011700000001, 'node_name': 'ERR7253726', 'node_root_id': 'ERR7253726', 'mile': 5, 'id': 112, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 20400, 'node_y': 14021.759195488125}, 'classes': 'Germany'}, {'data': {'node_root_date': 71.32289000000002, 'node_name': 'ERR5413067', 'node_root_id': 'ERR5413067', 'mile': 8, 'id': 113, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 34800, 'node_y': 19243.219881654066}, 'classes': 'UK'}, {'data': {'node_root_date': 71.32289000000002, 'node_name': 'SRR6045906', 'node_root_id': 'SRR6045906', 'mile': 8, 'id': 114, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 35400, 'node_y': 19243.219881654066}, 'classes': 'UK'}, {'data': {'node_root_date': 60.726767, 'node_name': 'SRR7800649', 'node_root_id': 'SRR7800649', 'mile': 6, 'id': 115, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 9600, 'node_y': 16384.340708613658}, 'classes': 'USA'}, {'data': {'node_root_date': 63.860152, 'node_name': 'SRR12051816', 'node_root_id': 'SRR12051816', 'mile': 6, 'id': 116, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 10200, 'node_y': 17229.74134407412}, 'classes': 'USA'}, {'data': {'node_root_date': 75.610369, 'node_name': 'ERR330766', 'node_root_id': 'ERR330766', 'mile': 8, 'id': 117, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 10800, 'node_y': 20400.000000000004}, 'classes': 'UK'}, {'data': {'node_root_date': 75.610369, 'node_name': 'ERR363252', 'node_root_id': 'ERR363252', 'mile': 8, 'id': 118, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 11400, 'node_y': 20400.000000000004}, 'classes': 'UK'}, {'data': {'node_root_date': 48.77098, 'node_name': 'ERR5413462', 'node_root_id': 'ERR5413462', 'mile': 5, 'id': 119, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 12000, 'node_y': 13158.618390025316}, 'classes': 'UK'}, {'data': {'node_root_date': 48.77098, 'node_name': 'n13', 'node_root_id': 'n13', 'mile': 5, 'id': 120, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 12900.0, 'node_y': 13158.618390025316}, 'classes': 'UK'}, {'data': {'id': 'fake_node_127', 'fake': 1, 'node_x': 12600, 'node_y': 13158.618390025316}}, {'data': {'id': 'fake_node_128', 'fake': 1, 'node_x': 13200, 'node_y': 13158.618390025316}}, {'data': {'node_root_date': 47.876998, 'node_name': 'SRR30795562', 'node_root_id': 'SRR30795562', 'mile': 4, 'id': 121, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 13800, 'node_y': 12917.418233999097}, 'classes': 'USA'}, {'data': {'node_root_date': 47.01133900000001, 'node_name': 'DRR317488', 'node_root_id': 'DRR317488', 'mile': 4, 'id': 122, 'tip': 1, 'tooltip': 'geo_loc_name_country: Japan', 'node_x': 14400, 'node_y': 12683.859744157578}, 'classes': 'Japan'}, {'data': {'node_root_date': 38.341857000000005, 'node_name': 'n16', 'node_root_id': 'n16', 'mile': 3, 'id': 123, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 15900.0, 'node_y': 10344.796529163877}, 'classes': 'UK'}, {'data': {'id': 'fake_node_129', 'fake': 1, 'node_x': 15600, 'node_y': 10344.796529163877}}, {'data': {'id': 'fake_node_130', 'fake': 1, 'node_x': 16200, 'node_y': 10344.796529163877}}, {'data': {'node_root_date': 26.201467, 'node_name': 'ERR5413262', 'node_root_id': 'ERR5413262', 'mile': 0, 'id': 124, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 16800, 'node_y': 7069.267533927788}, 'classes': 'UK'}, {'data': {'node_root_date': 26.201467, 'node_name': 'n17', 'node_root_id': 'n17', 'mile': 1, 'id': 125, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 17700.0, 'node_y': 7069.267533927788}, 'classes': 'UK'}, {'data': {'id': 'fake_node_131', 'fake': 1, 'node_x': 17400, 'node_y': 7069.267533927788}}, {'data': {'id': 'fake_node_132', 'fake': 1, 'node_x': 18000, 'node_y': 7069.267533927788}}, {'data': {'node_root_date': 26.201467, 'node_name': 'n1717', 'node_root_id': 'n1717', 'mile': 1, 'id': 126, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 18900.0, 'node_y': 7069.267533927788}, 'classes': 'UK'}, {'data': {'id': 'fake_node_133', 'fake': 1, 'node_x': 18600, 'node_y': 7069.267533927788}}, {'data': {'id': 'fake_node_134', 'fake': 1, 'node_x': 19200, 'node_y': 7069.267533927788}}, {'data': {'node_root_date': 48.772002, 'node_name': 'ERR5413609', 'node_root_id': 'ERR5413609', 'mile': 5, 'id': 127, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 12600, 'node_y': 13158.89412998368}, 'classes': 'UK'}, {'data': {'node_root_date': 48.772002, 'node_name': 'ERR5412044', 'node_root_id': 'ERR5412044', 'mile': 5, 'id': 128, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 13200, 'node_y': 13158.89412998368}, 'classes': 'UK'}, {'data': {'node_root_date': 38.342879, 'node_name': 'ERR340557', 'node_root_id': 'ERR340557', 'mile': 3, 'id': 129, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 15600, 'node_y': 10345.072269122244}, 'classes': 'UK'}, {'data': {'node_root_date': 38.342879, 'node_name': 'ERR374187', 'node_root_id': 'ERR374187', 'mile': 3, 'id': 130, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 16200, 'node_y': 10345.072269122244}, 'classes': 'UK'}, {'data': {'node_root_date': 26.202489, 'node_name': 'ERR5414162', 'node_root_id': 'ERR5414162', 'mile': 1, 'id': 131, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 17400, 'node_y': 7069.543273886152}, 'classes': 'UK'}, {'data': {'node_root_date': 26.202489, 'node_name': 'SRR6388679', 'node_root_id': 'SRR6388679', 'mile': 1, 'id': 132, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 18000, 'node_y': 7069.543273886152}, 'classes': 'UK'}, {'data': {'node_root_date': 26.202489, 'node_name': 'ERR5414218', 'node_root_id': 'ERR5414218', 'mile': 1, 'id': 133, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 18600, 'node_y': 7069.543273886152}, 'classes': 'UK'}, {'data': {'node_root_date': 26.202489, 'node_name': 'ERR5413423', 'node_root_id': 'ERR5413423', 'mile': 1, 'id': 134, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 19200, 'node_y': 7069.543273886152}, 'classes': 'UK'}], 'edges': [{'data': {'source': 'fake_node_0', 'target': 0, 'edge_name': 0.0, 'mile': 0}}, {'data': {'source': 0, 'target': 'fake_node_1', 'fake': 1, 'mile': 3}}, {'data': {'source': 'fake_node_1', 'target': 1, 'edge_name': 40.887753, 'mile': 3}}, {'data': {'source': 0, 'target': 'fake_node_2', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_2', 'target': 2, 'edge_name': 6.100135, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 1, 'target': 'fake_node_3', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 3}}, {'data': {'source': 'fake_node_3', 'target': 3, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 3}}, {'data': {'source': 1, 'target': 'fake_node_4', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 4}}, {'data': {'source': 'fake_node_4', 'target': 4, 'edge_name': 5.040195, 'edge_color': '#a6cee3', 'mile': 4}}, {'data': {'source': 2, 'target': 'fake_node_5', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_5', 'target': 5, 'edge_name': 2.955562, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 2, 'target': 'fake_node_6', 'fake': 1, 'mile': 4}}, {'data': {'source': 'fake_node_6', 'target': 6, 'edge_name': 14.309455, 'mile': 4}}, {'data': {'source': 5, 'target': 'fake_node_7', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_7', 'target': 7, 'edge_name': 3.016474, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 5, 'target': 'fake_node_8', 'fake': 1, 'mile': 4}}, {'data': {'source': 'fake_node_8', 'target': 8, 'edge_name': 33.113552, 'mile': 4}}, {'data': {'source': 6, 'target': 'fake_node_9', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 'fake_node_9', 'target': 9, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 6, 'target': 'fake_node_10', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 'fake_node_10', 'target': 10, 'edge_name': 38.02441, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 7, 'target': 'fake_node_11', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_11', 'target': 11, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 7, 'target': 'fake_node_12', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_12', 'target': 12, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 8, 'target': 'fake_node_13', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 4}}, {'data': {'source': 'fake_node_13', 'target': 13, 'edge_name': 0.976822, 'edge_color': '#b2df8a', 'mile': 4}}, {'data': {'source': 8, 'target': 'fake_node_14', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 4}}, {'data': {'source': 'fake_node_14', 'target': 14, 'edge_name': 3.063365, 'edge_color': '#b2df8a', 'mile': 4}}, {'data': {'source': 9, 'target': 'fake_node_15', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 'fake_node_15', 'target': 15, 'edge_name': 5.931944, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 9, 'target': 'fake_node_16', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 'fake_node_16', 'target': 16, 'edge_name': 21.755312, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 10, 'target': 'fake_node_17', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 'fake_node_17', 'target': 17, 'edge_name': 7.325529, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 10, 'target': 'fake_node_18', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_18', 'target': 18, 'edge_name': 8.164118, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 11, 'target': 'fake_node_19', 'fake': 1, 'mile': 3}}, {'data': {'source': 'fake_node_19', 'target': 19, 'edge_name': 24.537973, 'mile': 3}}, {'data': {'source': 11, 'target': 'fake_node_20', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_20', 'target': 20, 'edge_name': 19.263947, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 12, 'target': 'fake_node_21', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_21', 'target': 21, 'edge_name': 11.836819, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 12, 'target': 'fake_node_22', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_22', 'target': 22, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 15, 'target': 'fake_node_23', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_23', 'target': 23, 'edge_name': 28.912994, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 15, 'target': 'fake_node_24', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 'fake_node_24', 'target': 24, 'edge_name': 21.766613, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 16, 'target': 'fake_node_25', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 'fake_node_25', 'target': 25, 'edge_name': 17.39123, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 16, 'target': 'fake_node_26', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 'fake_node_26', 'target': 26, 'edge_name': 8.945606, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 18, 'target': 'fake_node_27', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_27', 'target': 27, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 18, 'target': 'fake_node_28', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_28', 'target': 28, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 20, 'target': 'fake_node_29', 'fake': 1, 'mile': 3}}, {'data': {'source': 'fake_node_29', 'target': 29, 'edge_name': 4.001625, 'mile': 3}}, {'data': {'source': 20, 'target': 'fake_node_30', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_30', 'target': 30, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 21, 'target': 'fake_node_31', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_31', 'target': 31, 'edge_name': 8.540366, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 21, 'target': 'fake_node_32', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 'fake_node_32', 'target': 32, 'edge_name': 17.387438, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 22, 'target': 'fake_node_33', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_33', 'target': 33, 'edge_name': 1.004522, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 22, 'target': 'fake_node_34', 'fake': 1, 'mile': 1}}, {'data': {'source': 'fake_node_34', 'target': 34, 'edge_name': 13.223514, 'mile': 1}}, {'data': {'source': 23, 'target': 'fake_node_35', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_35', 'target': 35, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 23, 'target': 'fake_node_36', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_36', 'target': 36, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 24, 'target': 'fake_node_37', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 'fake_node_37', 'target': 37, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 24, 'target': 'fake_node_38', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 'fake_node_38', 'target': 38, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 4}}, {'data': {'source': 26, 'target': 'fake_node_39', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_39', 'target': 39, 'edge_name': 3.979744, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 26, 'target': 'fake_node_40', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 'fake_node_40', 'target': 40, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 6}}, {'data': {'source': 30, 'target': 'fake_node_41', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 3}}, {'data': {'source': 'fake_node_41', 'target': 41, 'edge_name': 6.01883, 'edge_color': '#ff7f00', 'mile': 3}}, {'data': {'source': 30, 'target': 'fake_node_42', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_42', 'target': 42, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 31, 'target': 'fake_node_43', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_43', 'target': 43, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 31, 'target': 'fake_node_44', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_44', 'target': 44, 'edge_name': 1.006986, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 33, 'target': 'fake_node_45', 'fake': 1, 'mile': 5}}, {'data': {'source': 'fake_node_45', 'target': 45, 'edge_name': 42.496048, 'mile': 5}}, {'data': {'source': 33, 'target': 'fake_node_46', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 'fake_node_46', 'target': 46, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 0}}, {'data': {'source': 34, 'target': 'fake_node_47', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_47', 'target': 47, 'edge_name': 1.999261, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 34, 'target': 'fake_node_48', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_48', 'target': 48, 'edge_name': 2.01576, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 39, 'target': 'fake_node_49', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_49', 'target': 49, 'edge_name': 10.157236, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 39, 'target': 'fake_node_50', 'fake': 1, 'mile': 8}}, {'data': {'source': 'fake_node_50', 'target': 50, 'edge_name': 17.171413, 'mile': 8}}, {'data': {'source': 40, 'target': 'fake_node_51', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_51', 'target': 51, 'edge_name': 16.199455, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 40, 'target': 'fake_node_52', 'fake': 1, 'mile': 6}}, {'data': {'source': 'fake_node_52', 'target': 52, 'edge_name': 4.50178, 'mile': 6}}, {'data': {'source': 42, 'target': 'fake_node_53', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 3}}, {'data': {'source': 'fake_node_53', 'target': 53, 'edge_name': 2.998344, 'edge_color': '#ff7f00', 'mile': 3}}, {'data': {'source': 42, 'target': 'fake_node_54', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_54', 'target': 54, 'edge_name': 2.996828, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 43, 'target': 'fake_node_55', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_55', 'target': 55, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 43, 'target': 'fake_node_56', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_56', 'target': 56, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 45, 'target': 'fake_node_57', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 5}}, {'data': {'source': 'fake_node_57', 'target': 57, 'edge_name': 0.001022, 'edge_color': '#1f78b4', 'mile': 5}}, {'data': {'source': 45, 'target': 'fake_node_58', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 5}}, {'data': {'source': 'fake_node_58', 'target': 58, 'edge_name': 0.001022, 'edge_color': '#1f78b4', 'mile': 5}}, {'data': {'source': 46, 'target': 'fake_node_59', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 3}}, {'data': {'source': 'fake_node_59', 'target': 59, 'edge_name': 2.005277, 'edge_color': '#ff7f00', 'mile': 3}}, {'data': {'source': 46, 'target': 'fake_node_60', 'fake': 1, 'mile': 0}}, {'data': {'source': 'fake_node_60', 'target': 60, 'edge_name': 5.043019, 'mile': 0}}, {'data': {'source': 47, 'target': 'fake_node_61', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_61', 'target': 61, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 47, 'target': 'fake_node_62', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_62', 'target': 62, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 48, 'target': 'fake_node_63', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_63', 'target': 63, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 48, 'target': 'fake_node_64', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_64', 'target': 64, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 49, 'target': 'fake_node_65', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_65', 'target': 65, 'edge_name': 3.000449, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 49, 'target': 'fake_node_66', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_66', 'target': 66, 'edge_name': 2.012267, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 50, 'target': 'fake_node_67', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 8}}, {'data': {'source': 'fake_node_67', 'target': 67, 'edge_name': 0.001022, 'edge_color': '#b2df8a', 'mile': 8}}, {'data': {'source': 50, 'target': 'fake_node_68', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 8}}, {'data': {'source': 'fake_node_68', 'target': 68, 'edge_name': 0.001022, 'edge_color': '#b2df8a', 'mile': 8}}, {'data': {'source': 51, 'target': 'fake_node_69', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_69', 'target': 69, 'edge_name': 4.009708, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 51, 'target': 'fake_node_70', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_70', 'target': 70, 'edge_name': 4.007817, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 52, 'target': 'fake_node_71', 'fake': 1, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 'fake_node_71', 'target': 71, 'edge_name': 0.001022, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 52, 'target': 'fake_node_72', 'fake': 1, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 'fake_node_72', 'target': 72, 'edge_name': 0.001022, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 54, 'target': 'fake_node_73', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_73', 'target': 73, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 54, 'target': 'fake_node_74', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_74', 'target': 74, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 56, 'target': 'fake_node_75', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_75', 'target': 75, 'edge_name': 1.00893, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 56, 'target': 'fake_node_76', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 'fake_node_76', 'target': 76, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 2}}, {'data': {'source': 59, 'target': 'fake_node_77', 'fake': 1, 'mile': 3}}, {'data': {'source': 'fake_node_77', 'target': 77, 'edge_name': 20.732471, 'mile': 3}}, {'data': {'source': 59, 'target': 'fake_node_78', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 'fake_node_78', 'target': 78, 'edge_name': 2.024176, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 60, 'target': 'fake_node_79', 'fake': 1, 'mile': 4}}, {'data': {'source': 'fake_node_79', 'target': 79, 'edge_name': 25.564013, 'mile': 4}}, {'data': {'source': 60, 'target': 'fake_node_80', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 'fake_node_80', 'target': 80, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 63, 'target': 'fake_node_81', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 'fake_node_81', 'target': 81, 'edge_name': 4.018727, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 63, 'target': 'fake_node_82', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_82', 'target': 82, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 64, 'target': 'fake_node_83', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_83', 'target': 83, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 64, 'target': 'fake_node_84', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_84', 'target': 84, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 66, 'target': 'fake_node_85', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_85', 'target': 85, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 66, 'target': 'fake_node_86', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_86', 'target': 86, 'edge_name': 2.997072, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 69, 'target': 'fake_node_87', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_87', 'target': 87, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 69, 'target': 'fake_node_88', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_88', 'target': 88, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 70, 'target': 'fake_node_89', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_89', 'target': 89, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 70, 'target': 'fake_node_90', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_90', 'target': 90, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 72, 'target': 'fake_node_91', 'fake': 1, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 'fake_node_91', 'target': 91, 'edge_name': 4.501328, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 72, 'target': 'fake_node_92', 'fake': 1, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 'fake_node_92', 'target': 92, 'edge_name': 0.001022, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 78, 'target': 'fake_node_93', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 'fake_node_93', 'target': 93, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 78, 'target': 'fake_node_94', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 'fake_node_94', 'target': 94, 'edge_name': 0.001022, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 80, 'target': 'fake_node_95', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 'fake_node_95', 'target': 95, 'edge_name': 8.075623, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 80, 'target': 'fake_node_96', 'fake': 1, 'mile': 5}}, {'data': {'source': 'fake_node_96', 'target': 96, 'edge_name': 23.848448, 'mile': 5}}, {'data': {'source': 81, 'target': 'fake_node_97', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 'fake_node_97', 'target': 97, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 81, 'target': 'fake_node_98', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 'fake_node_98', 'target': 98, 'edge_name': 0.001022, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 86, 'target': 'fake_node_99', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_99', 'target': 99, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 86, 'target': 'fake_node_100', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_100', 'target': 100, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 90, 'target': 'fake_node_101', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_101', 'target': 101, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 90, 'target': 'fake_node_102', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 'fake_node_102', 'target': 102, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 7}}, {'data': {'source': 91, 'target': 'fake_node_103', 'fake': 1, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 'fake_node_103', 'target': 103, 'edge_name': 0.001022, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 91, 'target': 'fake_node_104', 'fake': 1, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 'fake_node_104', 'target': 104, 'edge_name': 0.001022, 'edge_color': '#33a02c', 'mile': 6}}, {'data': {'source': 93, 'target': 'fake_node_105', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 'fake_node_105', 'target': 105, 'edge_name': 42.669327, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 93, 'target': 'fake_node_106', 'fake': 1, 'mile': 8}}, {'data': {'source': 'fake_node_106', 'target': 106, 'edge_name': 58.499113, 'mile': 8}}, {'data': {'source': 94, 'target': 'fake_node_107', 'fake': 1, 'mile': 5}}, {'data': {'source': 'fake_node_107', 'target': 107, 'edge_name': 31.659724, 'mile': 5}}, {'data': {'source': 94, 'target': 'fake_node_108', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 'fake_node_108', 'target': 108, 'edge_name': 5.018359, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 95, 'target': 'fake_node_109', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 'fake_node_109', 'target': 109, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 95, 'target': 'fake_node_110', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_110', 'target': 110, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 96, 'target': 'fake_node_111', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 6}}, {'data': {'source': 'fake_node_111', 'target': 111, 'edge_name': 17.507511, 'edge_color': '#b2df8a', 'mile': 6}}, {'data': {'source': 96, 'target': 'fake_node_112', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 5}}, {'data': {'source': 'fake_node_112', 'target': 112, 'edge_name': 9.997869, 'edge_color': '#b2df8a', 'mile': 5}}, {'data': {'source': 101, 'target': 'fake_node_113', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_113', 'target': 113, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 101, 'target': 'fake_node_114', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_114', 'target': 114, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 105, 'target': 'fake_node_115', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 'fake_node_115', 'target': 115, 'edge_name': 0.947206, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 105, 'target': 'fake_node_116', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 'fake_node_116', 'target': 116, 'edge_name': 4.080591, 'edge_color': '#ff7f00', 'mile': 6}}, {'data': {'source': 106, 'target': 'fake_node_117', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_117', 'target': 117, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 106, 'target': 'fake_node_118', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 'fake_node_118', 'target': 118, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 8}}, {'data': {'source': 107, 'target': 'fake_node_119', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_119', 'target': 119, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 107, 'target': 'fake_node_120', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_120', 'target': 120, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 108, 'target': 'fake_node_121', 'fake': 1, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 'fake_node_121', 'target': 121, 'edge_name': 25.748405, 'edge_color': '#ff7f00', 'mile': 4}}, {'data': {'source': 108, 'target': 'fake_node_122', 'fake': 1, 'mile': 4}}, {'data': {'source': 'fake_node_122', 'target': 122, 'edge_name': 24.882746, 'mile': 4}}, {'data': {'source': 109, 'target': 'fake_node_123', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 3}}, {'data': {'source': 'fake_node_123', 'target': 123, 'edge_name': 12.141412, 'edge_color': '#fdbf6f', 'mile': 3}}, {'data': {'source': 109, 'target': 'fake_node_124', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 'fake_node_124', 'target': 124, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 0}}, {'data': {'source': 110, 'target': 'fake_node_125', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_125', 'target': 125, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 110, 'target': 'fake_node_126', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_126', 'target': 126, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 120, 'target': 'fake_node_127', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_127', 'target': 127, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 120, 'target': 'fake_node_128', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 'fake_node_128', 'target': 128, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 5}}, {'data': {'source': 123, 'target': 'fake_node_129', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 3}}, {'data': {'source': 'fake_node_129', 'target': 129, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 3}}, {'data': {'source': 123, 'target': 'fake_node_130', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 3}}, {'data': {'source': 'fake_node_130', 'target': 130, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 3}}, {'data': {'source': 125, 'target': 'fake_node_131', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_131', 'target': 131, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 125, 'target': 'fake_node_132', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_132', 'target': 132, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 126, 'target': 'fake_node_133', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_133', 'target': 133, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 126, 'target': 'fake_node_134', 'fake': 1, 'edge_color': '#fdbf6f', 'mile': 1}}, {'data': {'source': 'fake_node_134', 'target': 134, 'edge_name': 0.001022, 'edge_color': '#fdbf6f', 'mile': 1}}]},
+
+  layout: layoutOptions,
+
+  ready: function(){
+    window.cy = this;
+  }
+});
+
+function addQtips() {
+    cy.filter(function(ele, i, eles) {
+        return ele.isNode() && ele.data('tooltip') !== undefined;
+    } ).qtip({
+        content: function(){
+                return '<br><div style="overflow: auto;"><span style="white-space:nowrap;">'
+                + this.data('tooltip') + '</span></div>' + '<br>id: ' + this.data('node_root_id')
+                + '<br>dist. to root: ' + this.data('node_root_date');
+            },
+        show: {event: 'mouseover'},
+        hide: {event: 'mouseout'},
+        style: {
+                classes: 'qtip-bootstrap',
+        },
+        position: {
+            at: 'center center',
+        }
+    });
+}
+
+cy.minZoom(.001);
+cy.maxZoom(20);
+addQtips();
+
+
+function toImage(){
+    document.getElementById("downloader").href = cy.jpg({ full: false, quality: 1.0, scale: 2}).replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}
+
+function saveAsSvg() {
+    var svgContent = cy.svg({scale: 1, full: true});
+    var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+    document.getElementById("downloader_svg").href = URL.createObjectURL(blob);
+}
+
+function fit() {
+    cy.fit();
+}
+
+function resetLayout() {
+    cy.startBatch();
+    cy.layout(layoutOptions).run();
+
+    if (slider !== null) {
+        var cur_dist_attr = 'edge_name_' + slider.value;
+        var initial_dist_attr = 'edge_name_' + slider.max;
+        var cur_dist, initial_dist, mile;
+
+        if (removed !== undefined) {
+            removed.forEach(function( ele ) {
+                if (ele.isEdge()) {
+                    ele.target().position('x', ele.target().data('node_x'));
+                    ele.target().position('y', ele.target().data('node_y'));
+
+                    // the targets of hidden nodes might need to be moved to the last visible position for LTT timeline
+                    if (ele.data(initial_dist_attr) !== undefined) {
+                        mile = ele.target().data('mile');
+                        if (mile !== undefined) {
+                            initial_dist = ele.data(initial_dist_attr);
+                            cur_dist = ele.data('edge_name_' + mile);
+                            ele.target().position('y', (ele.source().position('y') +
+                            cur_dist * (ele.target().position('y') - ele.source().position('y')) / initial_dist));
+                        }
+                    }
+                }
+            });
+        }
+
+        cy.edges().forEach(function( ele ) {
+            cur_dist = ele.data(cur_dist_attr);
+            initial_dist = ele.data(initial_dist_attr);
+            if (cur_dist !== undefined && cur_dist != initial_dist) {
+                ele.target().position('y', (ele.source().position('y') +
+                cur_dist * (ele.target().position('y') - ele.source().position('y')) / initial_dist));
+            }
+        });
+    }
+    cy.endBatch();
+}
+
+var years = ['26.2015', '27.3155', '34.337', '40.8888', '48.1102', '55.5758', '65.7595', '71.3219', '75.6104'];
+var slider = document.getElementById("myRange");
+if (slider !== null) {
+    var output = document.getElementById("demo");
+    output.innerHTML = years[slider.value]; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    var removed = cy.collection();
+
+    slider.oninput = function() {
+        output.innerHTML = years[this.value];
+
+        cy.startBatch();
+
+        removed.restore();
+        removed = cy.remove("[mile>" + this.value + "]");
+
+        var cur_dist_attr = 'edge_name_' + this.value;
+        var initial_dist_attr = 'edge_name_' + this.max;
+        var old_dist, cur_dist;
+
+        cy.edges().forEach(function( ele ){
+            old_dist = ele.data('edge_name');
+            cur_dist = ele.data(cur_dist_attr);
+            if (cur_dist !== undefined && cur_dist != old_dist) {
+                if (ele.data(initial_dist_attr) != cur_dist) {
+                    ele.target().data('hidden', 1);
+                } else {
+                    ele.target().data('hidden', 0);
+                    console.log(ele.target().data());
+                }
+                ele.target().position('y', (ele.source().position('y')
+                + cur_dist * (ele.target().position('y') - ele.source().position('y')) / old_dist));
+                ele.data('edge_name', cur_dist);
+            }
+        });
+        cy.endBatch();
+    }
+}
+
+function toggleFullScreen() {
+  var elem = document.getElementById("fullscreenDiv");
+  if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+   (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (elem.requestFullScreen) {
+      elem.requestFullScreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullScreen) {
+      elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-resize-small"
+    document.getElementById("fstext").innerHTML = "  Exit full screen"
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-fullscreen"
+    document.getElementById("fstext").innerHTML = "  Full screen"
+  }
+}</script>
+</body>
+</html>

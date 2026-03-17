@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: helvetica,serif;
+  font-size: 14px;
+}
+
+#cy {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+}
+
+h1 {
+  opacity: 0.5;
+  font-size: 1em;
+}
+
+.floating {
+    max-width: 30%;
+    width: 120px;
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.cy-button {
+    background-color: #555555;
+    border: none;
+    color: white;
+    padding: 6px 0px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+a.cy-button:link, a.cy-button:visited, a.cy-button:hover {
+    color: white;
+    text-decoration: none;
+}
+
+
+.slidertext {
+    width: 100%;
+    color: #555555;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    text-align: center;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    margin: 10px 0px;
+    display: inline-block;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+@media all and (max-width: 600px) {
+    .buttontext {
+        display: none;
+    }
+}
+
+
+</style>
+<meta charset=utf-8 />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+<title>840876ad-1847-45ac-817b-4309d42aad97.full</title>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.qtip.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-qtip.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-svg.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/layout-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cose-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-cose-bilkent.min.js"></script>
+    
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/jquery.qtip.min.css"/>
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/bootstrap.min.css"/>
+    
+<meta http-Equiv="Cache-Control" Content="no-cache" />
+<meta http-Equiv="Pragma" Content="no-cache" />
+<meta http-Equiv="Expires" Content="0" />
+</head>
+<body>
+<div id="fullscreenDiv">
+<div id="cy"></div>
+<div class="floating">
+    <a class="cy-button" href="#" id="fit" onclick="fit()">
+        <span class="glyphicon glyphicon-resize-full"></span><span class="buttontext">  Fit screen</span>
+    </a>
+    <a class="cy-button" href="#" id="reset" onclick="resetLayout()">
+        <span class="glyphicon glyphicon-picture"></span><span class="buttontext">  Restore layout</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader" onclick="toImage()" download="840876ad-1847-45ac-817b-4309d42aad97.full.jpg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (jpg)</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader_svg" onclick="saveAsSvg()" download="840876ad-1847-45ac-817b-4309d42aad97.full.svg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (svg)</span>
+    </a>
+    <a class="cy-button" href="#" id="fullscreen" onclick="toggleFullScreen()">
+        <span id="fsspan" class="glyphicon glyphicon-fullscreen"></span><span id="fstext" class="buttontext">  Full screen</span>
+    </a>
+    
+<div class="slidecontainer">
+  <input type="range" min="0" max="7" value="7" class="slider" id="myRange" step="1">
+  <div class="slidertext">dist. to root: <span id="demo"></span></div>
+</div>
+</div></div>
+<!-- Load appplication code at the end to ensure DOM is loaded -->
+<script type="text/javascript">var layoutOptions = {
+  name: 'preset',
+  positions: function(node){
+    node.position('x', node.data('node_x'));
+    node.position('y', node.data('node_y'));
+    return node.position();
+  },
+  fit: true, // whether to fit to viewport
+  padding: 1, // padding on fit
+};
+
+
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+
+  style: cytoscape.stylesheet()
+    .selector('node')
+      .css({
+        'width': 300,
+        'height': 300,
+        'content': '',
+        'shape': 'barrel',
+        'pie-size': '100%',
+        'background-color': '#909090',
+        'color': '#383838',
+        'text-opacity': 1,
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-size': 80,
+        'text-halign' : 'center',
+        'text-valign' : 'center',
+        'min-zoomed-font-size': 12,
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': .3,
+        'text-background-padding' : 1,
+      })
+    .selector('node[node_name]')
+      .css({
+        'content': 'data(node_name)',
+      })
+    .selector('node[tip]')
+      .css({
+        'width': 500,
+        'height': 500,
+        'font-size': 100,
+        'shape': 'ellipse',
+      })
+    .selector('node[unresolved]')
+      .css({
+        'shape': 'octagon',
+        'pie-size': '90%',
+        'width': 600,
+        'height': 600,
+        'font-size': 150,
+      })
+    .selector('node[fake]')
+      .css({
+        'shape': 'rectangle',
+        'width': 1,
+        'height': 1,
+        'text-opacity': 0,
+        'font-size': 1,
+        'text-background-opacity': 0,
+        'text-background-padding' : 0,
+        'opacity': 0,
+      })
+    .selector('node[hidden>0]')
+      .css({
+        'opacity': 0.1,
+        'width': 100,
+        'height': 100,
+      })
+    
+    .selector(".Australia")
+        .css({
+        
+                'pie-1-background-color': "#a6cee3",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Singapore")
+        .css({
+        
+                'pie-1-background-color': "#1f78b4",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".UK")
+        .css({
+        
+                'pie-1-background-color': "#b2df8a",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector('edge')
+      .css({
+        'width': 100,
+        'font-size': 100,
+        'color': 'black',
+        'content': '',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'target-arrow-color': '#909090',
+        'opacity': 1,
+        'text-opacity': 1,
+        'line-color': '#909090',
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': 1,
+        'text-background-padding' : 4,
+        'min-zoomed-font-size': 10,
+        'line-style': 'solid',
+        'line-dash-pattern': [200, 20],
+      })
+    .selector('edge[polytomy]')
+      .css({
+        'line-style': 'dashed',
+      })
+    .selector('edge[fake]')
+      .css({
+        'target-arrow-shape': 'none',
+      })
+    .selector('edge[edge_name]')
+      .css({
+        'content': 'data(edge_name)',
+      })
+    .selector('edge[edge_color]')
+      .css({
+        'target-arrow-color': 'data(edge_color)',
+        'line-color': 'data(edge_color)',
+        'width': 80,
+      })
+    .selector(':selected')
+      .css({
+        'background-color': 'black',
+        'line-color': 'black',
+        'target-arrow-color': 'black',
+        'source-arrow-color': 'black',
+        'pie-size': '60%',
+        'opacity': 1
+      })
+    .selector('.faded')
+      .css({
+        'opacity': 0.25,
+        'text-opacity': 0
+      }),
+
+  elements: {'nodes': [{'data': {'id': 'fake_node_0', 'fake': 1, 'node_x': 2906.25, 'node_y': 0.0}}, {'data': {'node_root_date': 0, 'node_name': 'root', 'mile': 0, 'node_root_id': 'root', 'id': 0, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 2906.25, 'node_y': 0.0}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_1', 'fake': 1, 'node_x': 750.0, 'node_y': 0.0}}, {'data': {'id': 'fake_node_2', 'fake': 1, 'node_x': 5062.5, 'node_y': 0.0}}, {'data': {'node_root_date': 75.174431, 'node_name': 'n0', 'mile': 7, 'node_root_id': 'n0', 'id': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 750.0, 'node_y': 3971.443805434095}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_3', 'fake': 1, 'node_x': 300.0, 'node_y': 3971.443805434095}}, {'data': {'id': 'fake_node_4', 'fake': 1, 'node_x': 1200, 'node_y': 3971.443805434095}}, {'data': {'node_root_date': 0.000458, 'node_name': 'n1', 'mile': 0, 'node_root_id': 'n1', 'id': 2, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 5062.5, 'node_y': 0.024196009716240027}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_5', 'fake': 1, 'node_x': 3300.0, 'node_y': 0.024196009716240027}}, {'data': {'id': 'fake_node_6', 'fake': 1, 'node_x': 6825.0, 'node_y': 0.024196009716240027}}, {'data': {'node_root_date': 79.500254, 'node_name': 'n00', 'mile': 7, 'node_root_id': 'n00', 'id': 3, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 300.0, 'node_y': 4199.975803990284}, 'classes': 'UK'}, {'data': {'id': 'fake_node_7', 'fake': 1, 'node_x': 0, 'node_y': 4199.975803990284}}, {'data': {'id': 'fake_node_8', 'fake': 1, 'node_x': 600, 'node_y': 4199.975803990284}}, {'data': {'node_root_date': 77.224442, 'node_name': 'SRR14719264', 'mile': 7, 'node_root_id': 'SRR14719264', 'id': 4, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 1200, 'node_y': 4079.7453034131318}, 'classes': 'Singapore'}, {'data': {'node_root_date': 21.930365, 'node_name': 'n11', 'mile': 3, 'node_root_id': 'n11', 'id': 5, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 3300.0, 'node_y': 1158.5749445866597}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_9', 'fake': 1, 'node_x': 2550.0, 'node_y': 1158.5749445866597}}, {'data': {'id': 'fake_node_10', 'fake': 1, 'node_x': 4050.0, 'node_y': 1158.5749445866597}}, {'data': {'node_root_date': 32.206019000000005, 'node_name': 'n4', 'mile': 0, 'node_root_id': 'n4', 'id': 6, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 6825.0, 'node_y': 1701.434822369893}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_11', 'fake': 1, 'node_x': 6150.0, 'node_y': 1701.434822369893}}, {'data': {'id': 'fake_node_12', 'fake': 1, 'node_x': 7500.0, 'node_y': 1701.434822369893}}, {'data': {'node_root_date': 79.500712, 'node_name': 'ERR5412176', 'mile': 7, 'node_root_id': 'ERR5412176', 'id': 7, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 0, 'node_y': 4200.0}, 'classes': 'UK'}, {'data': {'node_root_date': 79.500712, 'node_name': 'ERR5413548', 'mile': 7, 'node_root_id': 'ERR5413548', 'id': 8, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 600, 'node_y': 4200.0}, 'classes': 'UK'}, {'data': {'node_root_date': 22.670582999999997, 'node_name': 'n2', 'mile': 3, 'node_root_id': 'n2', 'id': 9, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 2550.0, 'node_y': 1197.680450962502}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_13', 'fake': 1, 'node_x': 2100.0, 'node_y': 1197.680450962502}}, {'data': {'id': 'fake_node_14', 'fake': 1, 'node_x': 3000, 'node_y': 1197.680450962502}}, {'data': {'node_root_date': 23.481189999999998, 'node_name': 'n3', 'mile': 4, 'node_root_id': 'n3', 'id': 10, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 4050.0, 'node_y': 1240.5045881853234}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_15', 'fake': 1, 'node_x': 3600, 'node_y': 1240.5045881853234}}, {'data': {'id': 'fake_node_16', 'fake': 1, 'node_x': 4500.0, 'node_y': 1240.5045881853234}}, {'data': {'node_root_date': 32.20647700000001, 'node_name': 'n44', 'mile': 0, 'node_root_id': 'n44', 'id': 11, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 6150.0, 'node_y': 1701.4590183796095}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_17', 'fake': 1, 'node_x': 5700.0, 'node_y': 1701.4590183796095}}, {'data': {'id': 'fake_node_18', 'fake': 1, 'node_x': 6600, 'node_y': 1701.4590183796095}}, {'data': {'node_root_date': 33.215034, 'node_name': 'n55', 'mile': 2, 'node_root_id': 'n55', 'id': 12, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 7500.0, 'node_y': 1754.7407977931068}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_19', 'fake': 1, 'node_x': 7200, 'node_y': 1754.7407977931068}}, {'data': {'id': 'fake_node_20', 'fake': 1, 'node_x': 7800, 'node_y': 1754.7407977931068}}, {'data': {'node_root_date': 33.320313, 'node_name': 'n22', 'mile': 3, 'node_root_id': 'n22', 'id': 13, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 2100.0, 'node_y': 1760.302657415194}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_21', 'fake': 1, 'node_x': 1800, 'node_y': 1760.302657415194}}, {'data': {'id': 'fake_node_22', 'fake': 1, 'node_x': 2400, 'node_y': 1760.302657415194}}, {'data': {'node_root_date': 47.823459, 'node_name': 'SRR14719214', 'mile': 5, 'node_root_id': 'SRR14719214', 'id': 14, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 3000, 'node_y': 2526.499734996084}, 'classes': 'Singapore'}, {'data': {'node_root_date': 45.019818, 'node_name': 'SRR14719219', 'mile': 4, 'node_root_id': 'SRR14719219', 'id': 15, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 3600, 'node_y': 2378.3841784964143}, 'classes': 'Singapore'}, {'data': {'node_root_date': 24.698843999999998, 'node_name': 'n33', 'mile': 4, 'node_root_id': 'n33', 'id': 16, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 4500.0, 'node_y': 1304.8329026285953}, 'classes': 'Singapore'}, {'data': {'id': 'fake_node_23', 'fake': 1, 'node_x': 4200, 'node_y': 1304.8329026285953}}, {'data': {'id': 'fake_node_24', 'fake': 1, 'node_x': 4800, 'node_y': 1304.8329026285953}}, {'data': {'node_root_date': 32.20693500000001, 'node_name': 'n5', 'mile': 1, 'node_root_id': 'n5', 'id': 17, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 5700.0, 'node_y': 1701.483214389326}, 'classes': 'Australia'}, {'data': {'id': 'fake_node_25', 'fake': 1, 'node_x': 5400, 'node_y': 1701.483214389326}}, {'data': {'id': 'fake_node_26', 'fake': 1, 'node_x': 6000, 'node_y': 1701.483214389326}}, {'data': {'node_root_date': 32.20693500000001, 'node_name': 'ERR459800', 'mile': 0, 'node_root_id': 'ERR459800', 'id': 18, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 6600, 'node_y': 1701.483214389326}, 'classes': 'Australia'}, {'data': {'node_root_date': 33.215492000000005, 'node_name': 'ERR459802', 'mile': 2, 'node_root_id': 'ERR459802', 'id': 19, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 7200, 'node_y': 1754.7649938028233}, 'classes': 'Australia'}, {'data': {'node_root_date': 33.215492000000005, 'node_name': 'ERR484988', 'mile': 2, 'node_root_id': 'ERR484988', 'id': 20, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 7800, 'node_y': 1754.7649938028233}, 'classes': 'Australia'}, {'data': {'node_root_date': 40.785306, 'node_name': 'SRR14719279', 'mile': 3, 'node_root_id': 'SRR14719279', 'id': 21, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 1800, 'node_y': 2154.676114095683}, 'classes': 'Singapore'}, {'data': {'node_root_date': 57.319108, 'node_name': 'SRR14719134', 'mile': 6, 'node_root_id': 'SRR14719134', 'id': 22, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 2400, 'node_y': 3028.1521705113787}, 'classes': 'Singapore'}, {'data': {'node_root_date': 47.387654, 'node_name': 'SRR14719146', 'mile': 4, 'node_root_id': 'SRR14719146', 'id': 23, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 4200, 'node_y': 2503.4762808162022}, 'classes': 'Singapore'}, {'data': {'node_root_date': 70.0899, 'node_name': 'SRR14719109', 'mile': 6, 'node_root_id': 'SRR14719109', 'id': 24, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 4800, 'node_y': 3702.829479061773}, 'classes': 'Singapore'}, {'data': {'node_root_date': 32.20739300000001, 'node_name': 'ERR459799', 'mile': 1, 'node_root_id': 'ERR459799', 'id': 25, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 5400, 'node_y': 1701.507410399042}, 'classes': 'Australia'}, {'data': {'node_root_date': 32.20739300000001, 'node_name': 'ERR459801', 'mile': 1, 'node_root_id': 'ERR459801', 'id': 26, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 6000, 'node_y': 1701.507410399042}, 'classes': 'Australia'}], 'edges': [{'data': {'source': 'fake_node_0', 'target': 0, 'mile': 0, 'edge_name': 0.0}}, {'data': {'source': 0, 'target': 'fake_node_1', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 7}}, {'data': {'source': 'fake_node_1', 'target': 1, 'edge_color': '#1f78b4', 'mile': 7, 'edge_name': 75.174431}}, {'data': {'source': 0, 'target': 'fake_node_2', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 0}}, {'data': {'source': 'fake_node_2', 'target': 2, 'edge_color': '#1f78b4', 'mile': 0, 'edge_name': 0.000458}}, {'data': {'source': 1, 'target': 'fake_node_3', 'fake': 1, 'mile': 7}}, {'data': {'source': 'fake_node_3', 'target': 3, 'mile': 7, 'edge_name': 4.325823}}, {'data': {'source': 1, 'target': 'fake_node_4', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 7}}, {'data': {'source': 'fake_node_4', 'target': 4, 'edge_color': '#1f78b4', 'mile': 7, 'edge_name': 2.050011}}, {'data': {'source': 2, 'target': 'fake_node_5', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 3}}, {'data': {'source': 'fake_node_5', 'target': 5, 'edge_color': '#1f78b4', 'mile': 3, 'edge_name': 21.929907}}, {'data': {'source': 2, 'target': 'fake_node_6', 'fake': 1, 'mile': 0}}, {'data': {'source': 'fake_node_6', 'target': 6, 'mile': 0, 'edge_name': 32.205561}}, {'data': {'source': 3, 'target': 'fake_node_7', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 7}}, {'data': {'source': 'fake_node_7', 'target': 7, 'edge_color': '#b2df8a', 'mile': 7, 'edge_name': 0.000458}}, {'data': {'source': 3, 'target': 'fake_node_8', 'fake': 1, 'edge_color': '#b2df8a', 'mile': 7}}, {'data': {'source': 'fake_node_8', 'target': 8, 'edge_color': '#b2df8a', 'mile': 7, 'edge_name': 0.000458}}, {'data': {'source': 5, 'target': 'fake_node_9', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 3}}, {'data': {'source': 'fake_node_9', 'target': 9, 'edge_color': '#1f78b4', 'mile': 3, 'edge_name': 0.740218}}, {'data': {'source': 5, 'target': 'fake_node_10', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 4}}, {'data': {'source': 'fake_node_10', 'target': 10, 'edge_color': '#1f78b4', 'mile': 4, 'edge_name': 1.550825}}, {'data': {'source': 6, 'target': 'fake_node_11', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 0}}, {'data': {'source': 'fake_node_11', 'target': 11, 'edge_color': '#a6cee3', 'mile': 0, 'edge_name': 0.000458}}, {'data': {'source': 6, 'target': 'fake_node_12', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 'fake_node_12', 'target': 12, 'edge_color': '#a6cee3', 'mile': 2, 'edge_name': 1.009015}}, {'data': {'source': 9, 'target': 'fake_node_13', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 3}}, {'data': {'source': 'fake_node_13', 'target': 13, 'edge_color': '#1f78b4', 'mile': 3, 'edge_name': 10.64973}}, {'data': {'source': 9, 'target': 'fake_node_14', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 5}}, {'data': {'source': 'fake_node_14', 'target': 14, 'edge_color': '#1f78b4', 'mile': 5, 'edge_name': 25.152876}}, {'data': {'source': 10, 'target': 'fake_node_15', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 4}}, {'data': {'source': 'fake_node_15', 'target': 15, 'edge_color': '#1f78b4', 'mile': 4, 'edge_name': 21.538628}}, {'data': {'source': 10, 'target': 'fake_node_16', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 4}}, {'data': {'source': 'fake_node_16', 'target': 16, 'edge_color': '#1f78b4', 'mile': 4, 'edge_name': 1.217654}}, {'data': {'source': 11, 'target': 'fake_node_17', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_17', 'target': 17, 'edge_color': '#a6cee3', 'mile': 1, 'edge_name': 0.000458}}, {'data': {'source': 11, 'target': 'fake_node_18', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 0}}, {'data': {'source': 'fake_node_18', 'target': 18, 'edge_color': '#a6cee3', 'mile': 0, 'edge_name': 0.000458}}, {'data': {'source': 12, 'target': 'fake_node_19', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 'fake_node_19', 'target': 19, 'edge_color': '#a6cee3', 'mile': 2, 'edge_name': 0.000458}}, {'data': {'source': 12, 'target': 'fake_node_20', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 2}}, {'data': {'source': 'fake_node_20', 'target': 20, 'edge_color': '#a6cee3', 'mile': 2, 'edge_name': 0.000458}}, {'data': {'source': 13, 'target': 'fake_node_21', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 3}}, {'data': {'source': 'fake_node_21', 'target': 21, 'edge_color': '#1f78b4', 'mile': 3, 'edge_name': 7.464993}}, {'data': {'source': 13, 'target': 'fake_node_22', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 6}}, {'data': {'source': 'fake_node_22', 'target': 22, 'edge_color': '#1f78b4', 'mile': 6, 'edge_name': 23.998795}}, {'data': {'source': 16, 'target': 'fake_node_23', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 4}}, {'data': {'source': 'fake_node_23', 'target': 23, 'edge_color': '#1f78b4', 'mile': 4, 'edge_name': 22.68881}}, {'data': {'source': 16, 'target': 'fake_node_24', 'fake': 1, 'edge_color': '#1f78b4', 'mile': 6}}, {'data': {'source': 'fake_node_24', 'target': 24, 'edge_color': '#1f78b4', 'mile': 6, 'edge_name': 45.391056}}, {'data': {'source': 17, 'target': 'fake_node_25', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_25', 'target': 25, 'edge_color': '#a6cee3', 'mile': 1, 'edge_name': 0.000458}}, {'data': {'source': 17, 'target': 'fake_node_26', 'fake': 1, 'edge_color': '#a6cee3', 'mile': 1}}, {'data': {'source': 'fake_node_26', 'target': 26, 'edge_color': '#a6cee3', 'mile': 1, 'edge_name': 0.000458}}]},
+
+  layout: layoutOptions,
+
+  ready: function(){
+    window.cy = this;
+  }
+});
+
+function addQtips() {
+    cy.filter(function(ele, i, eles) {
+        return ele.isNode() && ele.data('tooltip') !== undefined;
+    } ).qtip({
+        content: function(){
+                return '<br><div style="overflow: auto;"><span style="white-space:nowrap;">'
+                + this.data('tooltip') + '</span></div>' + '<br>id: ' + this.data('node_root_id')
+                + '<br>dist. to root: ' + this.data('node_root_date');
+            },
+        show: {event: 'mouseover'},
+        hide: {event: 'mouseout'},
+        style: {
+                classes: 'qtip-bootstrap',
+        },
+        position: {
+            at: 'center center',
+        }
+    });
+}
+
+cy.minZoom(.001);
+cy.maxZoom(20);
+addQtips();
+
+
+function toImage(){
+    document.getElementById("downloader").href = cy.jpg({ full: false, quality: 1.0, scale: 2}).replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}
+
+function saveAsSvg() {
+    var svgContent = cy.svg({scale: 1, full: true});
+    var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+    document.getElementById("downloader_svg").href = URL.createObjectURL(blob);
+}
+
+function fit() {
+    cy.fit();
+}
+
+function resetLayout() {
+    cy.startBatch();
+    cy.layout(layoutOptions).run();
+
+    if (slider !== null) {
+        var cur_dist_attr = 'edge_name_' + slider.value;
+        var initial_dist_attr = 'edge_name_' + slider.max;
+        var cur_dist, initial_dist, mile;
+
+        if (removed !== undefined) {
+            removed.forEach(function( ele ) {
+                if (ele.isEdge()) {
+                    ele.target().position('x', ele.target().data('node_x'));
+                    ele.target().position('y', ele.target().data('node_y'));
+
+                    // the targets of hidden nodes might need to be moved to the last visible position for LTT timeline
+                    if (ele.data(initial_dist_attr) !== undefined) {
+                        mile = ele.target().data('mile');
+                        if (mile !== undefined) {
+                            initial_dist = ele.data(initial_dist_attr);
+                            cur_dist = ele.data('edge_name_' + mile);
+                            ele.target().position('y', (ele.source().position('y') +
+                            cur_dist * (ele.target().position('y') - ele.source().position('y')) / initial_dist));
+                        }
+                    }
+                }
+            });
+        }
+
+        cy.edges().forEach(function( ele ) {
+            cur_dist = ele.data(cur_dist_attr);
+            initial_dist = ele.data(initial_dist_attr);
+            if (cur_dist !== undefined && cur_dist != initial_dist) {
+                ele.target().position('y', (ele.source().position('y') +
+                cur_dist * (ele.target().position('y') - ele.source().position('y')) / initial_dist));
+            }
+        });
+    }
+    cy.endBatch();
+}
+
+var years = ['32.2069', '32.2074', '33.2155', '40.7853', '47.3877', '47.8235', '70.0899', '79.5007'];
+var slider = document.getElementById("myRange");
+if (slider !== null) {
+    var output = document.getElementById("demo");
+    output.innerHTML = years[slider.value]; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    var removed = cy.collection();
+
+    slider.oninput = function() {
+        output.innerHTML = years[this.value];
+
+        cy.startBatch();
+
+        removed.restore();
+        removed = cy.remove("[mile>" + this.value + "]");
+
+        var cur_dist_attr = 'edge_name_' + this.value;
+        var initial_dist_attr = 'edge_name_' + this.max;
+        var old_dist, cur_dist;
+
+        cy.edges().forEach(function( ele ){
+            old_dist = ele.data('edge_name');
+            cur_dist = ele.data(cur_dist_attr);
+            if (cur_dist !== undefined && cur_dist != old_dist) {
+                if (ele.data(initial_dist_attr) != cur_dist) {
+                    ele.target().data('hidden', 1);
+                } else {
+                    ele.target().data('hidden', 0);
+                    console.log(ele.target().data());
+                }
+                ele.target().position('y', (ele.source().position('y')
+                + cur_dist * (ele.target().position('y') - ele.source().position('y')) / old_dist));
+                ele.data('edge_name', cur_dist);
+            }
+        });
+        cy.endBatch();
+    }
+}
+
+function toggleFullScreen() {
+  var elem = document.getElementById("fullscreenDiv");
+  if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+   (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (elem.requestFullScreen) {
+      elem.requestFullScreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullScreen) {
+      elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-resize-small"
+    document.getElementById("fstext").innerHTML = "  Exit full screen"
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-fullscreen"
+    document.getElementById("fstext").innerHTML = "  Full screen"
+  }
+}</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+#NEXUS
+Begin Taxa;
+ Dimensions NTax=10;
+ TaxLabels SRR12574854 SRR12574874 SRR12574855 ERR7253757 ERR7253798 ERR7253805 SRR30795418 SRR32213595 SRR26728061 SRR26727979;
+End;
+Begin Trees;
+ Tree tree1=((SRR12574854:0.00039[&date=37.466017,geo_loc_name_country=USA],(SRR12574874:0.00039[&date=37.466408,geo_loc_name_country=USA],SRR12574855:0.00039[&date=37.466408,geo_loc_name_country=USA])n00:0.00039[&date=37.466017,geo_loc_name_country=USA])n0:37.46560[&date=37.465626,geo_loc_name_country=USA],(((ERR7253757:1.00661[&date=17.838063000000002,geo_loc_name_country=Germany],(ERR7253798:2.02191[&date=18.853754000000002,geo_loc_name_country=Germany],ERR7253805:1.01199[&date=17.843837,geo_loc_name_country=Germany])n22:0.00039[&date=16.831842,geo_loc_name_country=Germany])n2:13.05320[&date=16.831451,geo_loc_name_country=Germany],SRR30795418:19.44640[&date=23.224648,geo_loc_name_country=USA])n11:3.77781[&date=3.778204,geo_loc_name_country=Germany],(SRR32213595:14.49630[&date=14.497131,geo_loc_name_country=Argentina],(SRR26728061:47.48010[&date=47.481321,geo_loc_name_country=Canada],SRR26727979:21.10550[&date=21.106672,geo_loc_name_country=Canada])n33:0.00039[&date=0.001173,geo_loc_name_country=Canada])n3:0.00039[&date=0.000782,geo_loc_name_country=Canada])n1:0.00039[&date=0.000391,geo_loc_name_country=Canada])root:0.00000[&date=0,geo_loc_name_country=Canada];
+End;

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: helvetica,serif;
+  font-size: 14px;
+}
+
+#cy {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+}
+
+h1 {
+  opacity: 0.5;
+  font-size: 1em;
+}
+
+.floating {
+    max-width: 30%;
+    width: 120px;
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.cy-button {
+    background-color: #555555;
+    border: none;
+    color: white;
+    padding: 6px 0px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+a.cy-button:link, a.cy-button:visited, a.cy-button:hover {
+    color: white;
+    text-decoration: none;
+}
+
+
+.slidertext {
+    width: 100%;
+    color: #555555;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    text-align: center;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    margin: 10px 0px;
+    display: inline-block;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+@media all and (max-width: 600px) {
+    .buttontext {
+        display: none;
+    }
+}
+
+
+</style>
+<meta charset=utf-8 />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+<title>cbd8d776-6665-487b-80f1-9a0506a4733c.compressed</title>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.qtip.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-qtip.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-svg.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/layout-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cose-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-cose-bilkent.min.js"></script>
+    
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/jquery.qtip.min.css"/>
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/bootstrap.min.css"/>
+    
+<meta http-Equiv="Cache-Control" Content="no-cache" />
+<meta http-Equiv="Pragma" Content="no-cache" />
+<meta http-Equiv="Expires" Content="0" />
+</head>
+<body>
+<div id="fullscreenDiv">
+<div id="cy"></div>
+<div class="floating">
+    <a class="cy-button" href="#" id="fit" onclick="fit()">
+        <span class="glyphicon glyphicon-resize-full"></span><span class="buttontext">  Fit screen</span>
+    </a>
+    <a class="cy-button" href="#" id="reset" onclick="resetLayout()">
+        <span class="glyphicon glyphicon-picture"></span><span class="buttontext">  Restore layout</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader" onclick="toImage()" download="cbd8d776-6665-487b-80f1-9a0506a4733c.compressed.jpg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (jpg)</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader_svg" onclick="saveAsSvg()" download="cbd8d776-6665-487b-80f1-9a0506a4733c.compressed.svg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (svg)</span>
+    </a>
+    <a class="cy-button" href="#" id="fullscreen" onclick="toggleFullScreen()">
+        <span id="fsspan" class="glyphicon glyphicon-fullscreen"></span><span id="fstext" class="buttontext">  Full screen</span>
+    </a>
+    
+<div class="slidecontainer">
+  <input type="range" min="0" max="8" value="8" class="slider" id="myRange" step="1">
+  <div class="slidertext">dist. to root: <span id="demo"></span></div>
+</div>
+</div></div>
+<!-- Load appplication code at the end to ensure DOM is loaded -->
+<script type="text/javascript">var layoutOptions = {
+  name: 'preset',
+  positions: function(node){
+    node.position('x', node.data('node_x'));
+    node.position('y', node.data('node_y'));
+    return node.position();
+  },
+  fit: true, // whether to fit to viewport
+  padding: 1, // padding on fit
+};
+
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+
+  style: cytoscape.stylesheet()
+    .selector('node')
+      .css({
+        'width': 300,
+        'height': 300,
+        'content': '',
+        'shape': 'ellipse',
+        'pie-size': '100%',
+        'background-color': '#909090',
+        'color': '#383838',
+        'text-opacity': 1,
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-size': 80,
+        'text-halign' : 'center',
+        'text-valign' : 'center',
+        'min-zoomed-font-size': 12,
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': .3,
+        'text-background-padding' : 1,
+      })
+    .selector('node[node_name]')
+      .css({
+        'content': 'data(node_name)',
+      })
+    .selector('node[tip]')
+      .css({
+        'width': 400,
+        'height': 400,
+        'font-size': 100,
+      })
+    .selector('node[unresolved]')
+      .css({
+        'shape': 'octagon',
+        'pie-size': '92%',
+        'width': 500,
+        'height': 500,
+        'font-size': 125,
+      })
+    .selector('node[node_size]')
+      .css({
+        'width': 'data(node_size)',
+        'height': 'data(node_size)',
+      })
+    .selector('node[node_fontsize]')
+      .css({
+        'font-size': 'data(node_fontsize)',
+      })
+    
+    .selector(".Australia")
+        .css({
+        
+                'pie-1-background-color': "#cc8e66",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Canada")
+        .css({
+        
+                'pie-1-background-color': "#99ccad",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".China")
+        .css({
+        
+                'pie-1-background-color': "#7033cc",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Denmark")
+        .css({
+        
+                'pie-1-background-color': "#66ccb7",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Germany")
+        .css({
+        
+                'pie-1-background-color': "#c199cc",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Ireland")
+        .css({
+        
+                'pie-1-background-color': "#c1cc99",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Japan")
+        .css({
+        
+                'pie-1-background-color': "#33adcc",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Netherlands")
+        .css({
+        
+                'pie-1-background-color': "#cc66b7",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Singapore")
+        .css({
+        
+                'pie-1-background-color': "#8ecc66",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Spain")
+        .css({
+        
+                'pie-1-background-color': "#cc3370",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Taiwan")
+        .css({
+        
+                'pie-1-background-color': "#33cc33",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".UK")
+        .css({
+        
+                'pie-1-background-color': "#6666cc",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".USA")
+        .css({
+        
+                'pie-1-background-color': "#cc9999",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector('edge')
+      .css({
+        'width': 50,
+        'font-size': 80,
+        'color': 'black',
+        'content': '',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'target-arrow-color': '#909090',
+        'opacity': 0.8,
+        'text-opacity': 1,
+        'line-color': '#909090',
+        'line-style': 'solid',
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': 1,
+        'text-background-padding' : 4,
+        'min-zoomed-font-size': 10,
+        'line-dash-pattern': [100, 10],
+      })
+    .selector('edge[polytomy]')
+      .css({
+        'line-style': 'dashed',
+      })
+    .selector('edge[edge_name>1]')
+      .css({
+        'line-color': '#383838',
+        'target-arrow-color': '#383838',
+        'content': 'data(edge_name)',
+      })
+    .selector('edge[edge_size]')
+      .css({
+        'width': 'data(edge_size)',
+        'font-size': 'data(edge_size)',
+      })
+    .selector(':selected')
+      .css({
+        'background-color': 'black',
+        'line-color': 'black',
+        'target-arrow-color': 'black',
+        'source-arrow-color': 'black',
+        'pie-size': '60%',
+        'opacity': 1
+      })
+    .selector('.faded')
+      .css({
+        'opacity': 0.25,
+        'text-opacity': 0
+      }),
+
+  elements: {'nodes': [{'data': {'node_root_dates_2': '0', 'node_name_4': 'UK 48', 'node_in_tips_1': ' 15', 'node_roots_8': 'root', 'node_fontsize_7': 237, 'node_name_7': 'UK 63', 'node_name_2': 'UK 28', 'node_root_id': 'root', 'node_root_dates_8': '0', 'node_root_date': 0, 'node_in_ns_2': ' 66', 'node_size_8': 1600, 'node_name_8': 'UK 65', 'node_roots_3': 'root', 'node_name_3': 'UK 40', 'node_roots_1': 'root', 'node_size_4': 1375, 'node_in_ns': ' 107', 'node_roots_7': 'root', 'node_in_tips_4': ' 48', 'node_in_ns_6': ' 105', 'node_all_tips_8': ' 208', 'node_name_1': 'UK 15', 'node_root_dates_7': '0', 'node_name_6': 'UK 63', 'node_fontsize_0': 80, 'node_size_5': 1458, 'node_fontsize_1': 145, 'node_in_tips': ' 65', 'mile': 0, 'node_all_tips_5': ' 132', 'node_all_tips_4': ' 105', 'node_in_ns_0': ' 7', 'node_all_tips_6': ' 158', 'node_name_5': 'UK 54', 'node_in_ns_1': ' 40', 'node_name_0': 'UK 0', 'node_root_dates_3': '0', 'node_roots': 'root', 'node_size_0': 133, 'node_roots_6': 'root', 'node_in_tips_3': ' 40', 'node_in_ns_7': ' 105', 'node_in_ns_5': ' 97', 'node_in_tips_2': ' 28', 'node_name': 'UK 65', 'node_size_2': 1050, 'node_all_tips_7': ' 183', 'node_all_tips_1': ' 27', 'node_size_7': 1575, 'node_fontsize_8': 240, 'node_roots_5': 'root', 'node_size_3': 1255, 'node_in_tips_6': ' 63', 'node_all_tips_2': ' 53', 'node_in_ns_3': ' 80', 'node_fontsize_5': 223, 'node_root_dates': '0', 'node_roots_0': 'root', 'node_in_tips_5': ' 54', 'node_size': 1600, 'node_size_1': 769, 'node_root_dates_4': '0', 'node_roots_2': 'root', 'node_fontsize_3': 200, 'node_in_ns_4': ' 91', 'node_fontsize_2': 177, 'node_in_tips_7': ' 63', 'node_in_ns_8': ' 107', 'node_roots_4': 'root', 'node_all_tips': ' 208', 'node_all_tips_3': ' 79', 'node_size_6': 1575, 'node_root_dates_6': '0', 'node_root_dates_5': '0', 'node_fontsize_4': 214, 'node_fontsize': 240, 'node_in_tips_8': ' 65', 'node_root_dates_0': '0', 'node_all_tips_0': ' 1', 'node_fontsize_6': 237, 'node_in_tips_0': ' 0', 'node_root_dates_1': '0', 'id': 0, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6287.583333333333, 'node_y': 0}, 'classes': 'UK'}, {'data': {'node_root_dates_2': '5.020601999999999, 6.0227759999999995', 'node_name_4': 'Australia 1', 'node_in_tips_1': ' 1', 'node_roots_8': 'SRR25361426, SRR25361462, n4545', 'node_fontsize_7': 89, 'node_name_7': 'Australia 1-2', 'node_meta_1': 1, 'node_name_2': 'Australia 1', 'node_root_id': 'SRR25361462', 'node_root_dates_8': '5.020601999999999, 6.0227759999999995, 13.463989999999999', 'node_root_date': 6.0227759999999995, 'node_in_ns_2': ' 0', 'node_size_8': 282, 'node_name_8': 'Australia 1-2', 'node_roots_3': 'SRR25361426, SRR25361462', 'node_name_3': 'Australia 1', 'node_roots_1': 'SRR25361426, SRR25361462', 'node_size_4': 200, 'node_in_ns': ' 0-1', 'node_roots_7': 'SRR25361426, SRR25361462, n4545', 'node_in_tips_4': ' 1', 'node_in_ns_6': ' 0-1', 'node_all_tips_8': ' 1-2', 'node_meta_2': 1, 'node_name_1': 'Australia 1', 'node_meta_3': 1, 'node_root_dates_7': '5.020601999999999, 6.0227759999999995, 13.463989999999999', 'node_name_6': 'Australia 1-2', 'node_size_5': 200, 'node_fontsize_1': 80, 'node_in_tips': ' 1-2', 'mile': 1, 'node_all_tips_5': ' 1', 'node_all_tips_4': ' 1', 'node_all_tips_6': ' 1-2', 'node_name_5': 'Australia 1', 'node_in_ns_1': ' 0', 'node_root_dates_3': '5.020601999999999, 6.0227759999999995', 'node_roots': 'SRR25361426, SRR25361462, n4545', 'node_roots_6': 'SRR25361426, SRR25361462, n4545', 'node_in_tips_3': ' 1', 'node_in_ns_7': ' 0-1', 'node_in_ns_5': ' 0', 'node_meta_4': 1, 'node_in_tips_2': ' 1', 'node_name': 'Australia 1-2', 'node_size_2': 200, 'node_all_tips_7': ' 1-2', 'node_meta_6': 1, 'node_all_tips_1': ' 1', 'node_meta_8': 1, 'node_fontsize_8': 89, 'node_size_7': 282, 'node_meta_5': 1, 'node_roots_5': 'SRR25361426, SRR25361462', 'node_size_3': 200, 'node_in_tips_6': ' 1-2', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0', 'node_fontsize_5': 80, 'node_root_dates': '5.020601999999999, 6.0227759999999995, 13.463989999999999', 'node_in_tips_5': ' 1', 'node_size': 282, 'node_size_1': 200, 'node_root_dates_4': '5.020601999999999, 6.0227759999999995', 'node_roots_2': 'SRR25361426, SRR25361462', 'node_fontsize_3': 80, 'node_meta_7': 1, 'node_in_ns_4': ' 0', 'node_fontsize_2': 80, 'node_in_tips_7': ' 1-2', 'node_in_ns_8': ' 0-1', 'node_roots_4': 'SRR25361426, SRR25361462', 'node_all_tips': ' 1-2', 'node_all_tips_3': ' 1', 'node_size_6': 282, 'node_root_dates_6': '5.020601999999999, 6.0227759999999995, 13.463989999999999', 'node_root_dates_5': '5.020601999999999, 6.0227759999999995', 'node_fontsize_4': 80, 'node_fontsize': 89, 'node_in_tips_8': ' 1-2', 'node_fontsize_6': 89, 'node_meta': 1, 'node_root_dates_1': '5.020601999999999, 6.0227759999999995', 'id': 1, 'tip': 1, 'tooltip': 'geo_loc_name_country: Australia', 'node_x': 141.0, 'node_y': 1341.0}, 'classes': 'Australia'}, {'data': {'node_all_tips_8': ' 32', 'node_all_tips_7': ' 17', 'node_fontsize_8': 185, 'node_roots_8': 'n7878', 'node_size_7': 819, 'node_in_tips_7': ' 17', 'node_root_dates_7': '17.637237', 'node_fontsize_7': 150, 'node_in_ns_8': ' 31', 'node_name_7': 'Canada 17', 'node_all_tips': ' 32', 'node_in_tips': ' 32', 'mile': 7, 'node_root_id': 'n7878', 'node_root_dates_8': '17.637237', 'node_root_date': 17.637237, 'node_size_8': 1123, 'node_root_dates': '17.637237', 'node_fontsize': 185, 'node_name_8': 'Canada 32', 'node_size': 1123, 'node_in_tips_8': ' 32', 'node_roots': 'n7878', 'node_in_ns_7': ' 18', 'node_in_ns': ' 31', 'node_roots_7': 'n7878', 'node_name': 'Canada 32', 'id': 2, 'tip': 1, 'tooltip': 'geo_loc_name_country: Canada', 'node_x': 1243.5, 'node_y': 1761.5}, 'classes': 'Canada'}, {'data': {'node_name_4': 'Canada 5', 'node_roots_8': 'SRR26727934, n3131', 'node_fontsize_7': 108, 'node_name_7': 'Canada 1-5', 'node_root_id': 'n3131', 'node_root_dates_8': '12.242682, 8.033607', 'node_root_date': 8.033607, 'node_size_8': 445, 'node_name_8': 'Canada 1-5', 'node_roots_3': 'n3131', 'node_name_3': 'Canada 2', 'node_size_4': 445, 'node_in_ns': ' 0-4', 'node_roots_7': 'SRR26727934, n3131', 'node_in_tips_4': ' 5', 'node_in_ns_6': ' 0-4', 'node_all_tips_8': ' 1-5', 'node_root_dates_7': '12.242682, 8.033607', 'node_name_6': 'Canada 1-5', 'node_size_5': 445, 'node_in_tips': ' 1-5', 'mile': 3, 'node_all_tips_5': ' 1-5', 'node_all_tips_4': ' 5', 'node_all_tips_6': ' 1-5', 'node_name_5': 'Canada 1-5', 'node_root_dates_3': '8.033607', 'node_roots': 'SRR26727934, n3131', 'node_roots_6': 'SRR26727934, n3131', 'node_in_tips_3': ' 2', 'node_in_ns_7': ' 0-4', 'node_in_ns_5': ' 0-4', 'node_name': 'Canada 1-5', 'node_all_tips_7': ' 1-5', 'node_meta_6': 1, 'node_meta_8': 1, 'node_fontsize_8': 108, 'node_size_7': 445, 'node_meta_5': 1, 'node_roots_5': 'SRR26727934, n3131', 'node_size_3': 282, 'node_in_tips_6': ' 1-5', 'node_in_ns_3': ' 3', 'node_fontsize_5': 108, 'node_root_dates': '12.242682, 8.033607', 'node_in_tips_5': ' 1-5', 'node_size': 445, 'node_root_dates_4': '8.033607', 'node_fontsize_3': 89, 'node_meta_7': 1, 'node_in_ns_4': ' 4', 'node_in_tips_7': ' 1-5', 'node_in_ns_8': ' 0-4', 'node_roots_4': 'n3131', 'node_all_tips': ' 1-5', 'node_all_tips_3': ' 2', 'node_size_6': 445, 'node_root_dates_6': '12.242682, 8.033607', 'node_root_dates_5': '12.242682, 8.033607', 'node_fontsize_4': 108, 'node_fontsize': 108, 'node_in_tips_8': ' 1-5', 'node_fontsize_6': 108, 'node_meta': 1, 'id': 3, 'tip': 1, 'tooltip': 'geo_loc_name_country: Canada', 'node_x': 2427.5, 'node_y': 1422.5}, 'classes': 'Canada'}, {'data': {'node_root_dates_2': '5.021012999999999, 6.029180999999999, 4.024525', 'node_name_4': 'China 1-2', 'node_in_tips_1': ' 1', 'node_roots_8': 'SRR25637287, SRR25637288, SRR25637291, SRR32604912, SRR32604928, SRR32604960, n4747', 'node_fontsize_7': 89, 'node_name_7': 'China 1-2', 'node_name_2': 'China 1-2', 'node_root_id': 'SRR32604960', 'node_root_dates_8': '11.093734999999999, 5.021012999999999, 8.053655, 9.175699999999999, 10.119532, 6.029180999999999, 4.024525', 'node_root_date': 6.029180999999999, 'node_in_ns_2': ' 0-3', 'node_size_8': 282, 'node_name_8': 'China 1-2', 'node_roots_3': 'SRR25637288, SRR25637291, SRR32604960, n4747', 'node_name_3': 'China 1-2', 'node_roots_1': 'SRR25637288', 'node_size_4': 282, 'node_in_ns': ' 0-3', 'node_roots_7': 'SRR25637287, SRR25637288, SRR25637291, SRR32604912, SRR32604928, SRR32604960, n4747', 'node_in_tips_4': ' 1-2', 'node_in_ns_6': ' 0-3', 'node_all_tips_8': ' 1-4', 'node_meta_2': 1, 'node_name_1': 'China 1', 'node_meta_3': 1, 'node_root_dates_7': '11.093734999999999, 5.021012999999999, 8.053655, 9.175699999999999, 10.119532, 6.029180999999999, 4.024525', 'node_name_6': 'China 1-2', 'node_size_5': 282, 'node_fontsize_1': 80, 'node_in_tips': ' 1-2', 'mile': 1, 'node_all_tips_5': ' 1-3', 'node_all_tips_4': ' 1-3', 'node_all_tips_6': ' 1-4', 'node_name_5': 'China 1-2', 'node_in_ns_1': ' 0', 'node_root_dates_3': '5.021012999999999, 8.053655, 6.029180999999999, 4.024525', 'node_roots': 'SRR25637287, SRR25637288, SRR25637291, SRR32604912, SRR32604928, SRR32604960, n4747', 'node_roots_6': 'SRR25637287, SRR25637288, SRR25637291, SRR32604912, SRR32604928, SRR32604960, n4747', 'node_in_tips_3': ' 1-2', 'node_in_ns_7': ' 0-3', 'node_in_ns_5': ' 0-3', 'node_meta_4': 1, 'node_in_tips_2': ' 1-2', 'node_name': 'China 1-2', 'node_size_2': 282, 'node_all_tips_7': ' 1-4', 'node_meta_6': 1, 'node_all_tips_1': ' 1', 'node_meta_8': 1, 'node_fontsize_8': 89, 'node_size_7': 282, 'node_meta_5': 1, 'node_roots_5': 'SRR25637287, SRR25637288, SRR25637291, SRR32604912, SRR32604928, SRR32604960, n4747', 'node_size_3': 282, 'node_in_tips_6': ' 1-2', 'node_all_tips_2': ' 1-2', 'node_in_ns_3': ' 0-3', 'node_fontsize_5': 89, 'node_root_dates': '11.093734999999999, 5.021012999999999, 8.053655, 9.175699999999999, 10.119532, 6.029180999999999, 4.024525', 'node_in_tips_5': ' 1-2', 'node_size': 282, 'node_size_1': 200, 'node_root_dates_4': '5.021012999999999, 8.053655, 9.175699999999999, 10.119532, 6.029180999999999, 4.024525', 'node_roots_2': 'SRR25637288, SRR32604960, n4747', 'node_fontsize_3': 89, 'node_meta_7': 1, 'node_in_ns_4': ' 0-3', 'node_fontsize_2': 89, 'node_in_tips_7': ' 1-2', 'node_in_ns_8': ' 0-3', 'node_roots_4': 'SRR25637288, SRR25637291, SRR32604912, SRR32604928, SRR32604960, n4747', 'node_all_tips': ' 1-4', 'node_all_tips_3': ' 1-3', 'node_size_6': 282, 'node_root_dates_6': '11.093734999999999, 5.021012999999999, 8.053655, 9.175699999999999, 10.119532, 6.029180999999999, 4.024525', 'node_root_dates_5': '11.093734999999999, 5.021012999999999, 8.053655, 9.175699999999999, 10.119532, 6.029180999999999, 4.024525', 'node_fontsize_4': 89, 'node_fontsize': 89, 'node_in_tips_8': ' 1-2', 'node_fontsize_6': 89, 'node_meta': 1, 'node_root_dates_1': '5.021012999999999', 'id': 4, 'tip': 1, 'tooltip': 'geo_loc_name_country: China', 'node_x': 3191.0, 'node_y': 1341.0}, 'classes': 'China'}, {'data': {'node_in_ns_6': ' 1', 'node_all_tips_8': ' 2', 'node_all_tips_7': ' 2', 'node_fontsize_8': 89, 'node_roots_8': 'n00', 'node_size_7': 282, 'node_in_tips_7': ' 2', 'node_root_dates_7': '11.110099', 'node_fontsize_7': 89, 'node_in_ns_8': ' 1', 'node_name_6': 'Denmark 2', 'node_roots_5': 'n00', 'node_name_7': 'Denmark 2', 'node_size_5': 282, 'node_all_tips': ' 2', 'node_in_tips_6': ' 2', 'node_in_tips': ' 2', 'node_size_6': 282, 'mile': 5, 'node_root_id': 'n00', 'node_root_dates_8': '11.110099', 'node_root_date': 11.110099, 'node_root_dates_6': '11.110099', 'node_all_tips_5': ' 2', 'node_root_dates_5': '11.110099', 'node_size_8': 282, 'node_fontsize_5': 89, 'node_root_dates': '11.110099', 'node_fontsize': 89, 'node_all_tips_6': ' 2', 'node_name_8': 'Denmark 2', 'node_name_5': 'Denmark 2', 'node_in_tips_5': ' 2', 'node_size': 282, 'node_in_tips_8': ' 2', 'node_roots': 'n00', 'node_roots_6': 'n00', 'node_in_ns_7': ' 1', 'node_fontsize_6': 89, 'node_in_ns_5': ' 1', 'node_in_ns': ' 1', 'node_roots_7': 'n00', 'node_name': 'Denmark 2', 'id': 5, 'tip': 1, 'tooltip': 'geo_loc_name_country: Denmark', 'node_x': 3873.0, 'node_y': 1341.0}, 'classes': 'Denmark'}, {'data': {'node_root_dates_2': '5.019118999999999', 'node_name_4': 'Germany 10', 'node_in_tips_1': ' 4', 'node_roots_8': 'n3535', 'node_fontsize_7': 128, 'node_name_7': 'Germany 10', 'node_name_2': 'Germany 8', 'node_root_id': 'n3535', 'node_root_dates_8': '5.019118999999999', 'node_root_date': 5.019118999999999, 'node_in_ns_2': ' 9', 'node_size_8': 628, 'node_name_8': 'Germany 10', 'node_roots_3': 'n3535', 'node_name_3': 'Germany 10', 'node_roots_1': 'n3535', 'node_size_4': 628, 'node_in_ns': ' 9', 'node_roots_7': 'n3535', 'node_in_tips_4': ' 10', 'node_in_ns_6': ' 9', 'node_all_tips_8': ' 10', 'node_name_1': 'Germany 4', 'node_root_dates_7': '5.019118999999999', 'node_name_6': 'Germany 10', 'node_size_5': 628, 'node_fontsize_1': 102, 'node_in_tips': ' 10', 'mile': 1, 'node_all_tips_5': ' 10', 'node_all_tips_4': ' 10', 'node_all_tips_6': ' 10', 'node_name_5': 'Germany 10', 'node_in_ns_1': ' 6', 'node_root_dates_3': '5.019118999999999', 'node_roots': 'n3535', 'node_roots_6': 'n3535', 'node_in_tips_3': ' 10', 'node_in_ns_7': ' 9', 'node_in_ns_5': ' 9', 'node_in_tips_2': ' 8', 'node_name': 'Germany 10', 'node_size_2': 562, 'node_all_tips_7': ' 10', 'node_all_tips_1': ' 4', 'node_size_7': 628, 'node_fontsize_8': 128, 'node_roots_5': 'n3535', 'node_size_3': 628, 'node_in_tips_6': ' 10', 'node_all_tips_2': ' 8', 'node_in_ns_3': ' 9', 'node_fontsize_5': 128, 'node_root_dates': '5.019118999999999', 'node_in_tips_5': ' 10', 'node_size': 628, 'node_size_1': 398, 'node_root_dates_4': '5.019118999999999', 'node_roots_2': 'n3535', 'node_fontsize_3': 128, 'node_in_ns_4': ' 9', 'node_fontsize_2': 121, 'node_in_tips_7': ' 10', 'node_in_ns_8': ' 9', 'node_roots_4': 'n3535', 'node_all_tips': ' 10', 'node_all_tips_3': ' 10', 'node_size_6': 628, 'node_root_dates_6': '5.019118999999999', 'node_root_dates_5': '5.019118999999999', 'node_fontsize_4': 128, 'node_fontsize': 128, 'node_in_tips_8': ' 10', 'node_fontsize_6': 128, 'node_root_dates_1': '5.019118999999999', 'id': 6, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 4728.0, 'node_y': 1514.0}, 'classes': 'Germany'}, {'data': {'node_root_dates_2': '7.031396999999998', 'node_name_4': 'Germany 1', 'node_roots_8': 'ERR1869533, ERR1869535, ERR7253750', 'node_fontsize_7': 80, 'node_name_7': 'Germany 1', 'node_name_2': 'Germany 1', 'node_root_id': 'ERR1869535', 'node_root_dates_8': '10.486625, 7.031396999999998, 13.071569', 'node_root_date': 7.031396999999998, 'node_in_ns_2': ' 0', 'node_size_8': 200, 'node_name_8': 'Germany 1', 'node_roots_3': 'ERR1869535', 'node_name_3': 'Germany 1', 'node_size_4': 200, 'node_in_ns': ' 0', 'node_roots_7': 'ERR1869533, ERR1869535, ERR7253750', 'node_in_tips_4': ' 1', 'node_in_ns_6': ' 0', 'node_all_tips_8': ' 1', 'node_root_dates_7': '10.486625, 7.031396999999998, 13.071569', 'node_name_6': 'Germany 1', 'node_size_5': 200, 'node_in_tips': ' 1', 'mile': 2, 'node_all_tips_5': ' 1', 'node_all_tips_4': ' 1', 'node_all_tips_6': ' 1', 'node_name_5': 'Germany 1', 'node_root_dates_3': '7.031396999999998', 'node_roots': 'ERR1869533, ERR1869535, ERR7253750', 'node_roots_6': 'ERR1869533, ERR1869535, ERR7253750', 'node_in_tips_3': ' 1', 'node_in_ns_7': ' 0', 'node_in_ns_5': ' 0', 'node_in_tips_2': ' 1', 'node_name': 'Germany 1', 'node_size_2': 200, 'node_all_tips_7': ' 1', 'node_meta_6': 1, 'node_meta_8': 1, 'node_fontsize_8': 80, 'node_size_7': 200, 'node_meta_5': 1, 'node_roots_5': 'ERR1869533, ERR1869535', 'node_size_3': 200, 'node_in_tips_6': ' 1', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0', 'node_fontsize_5': 80, 'node_root_dates': '10.486625, 7.031396999999998, 13.071569', 'node_in_tips_5': ' 1', 'node_size': 200, 'node_root_dates_4': '7.031396999999998', 'node_roots_2': 'ERR1869535', 'node_fontsize_3': 80, 'node_meta_7': 1, 'node_in_ns_4': ' 0', 'node_fontsize_2': 80, 'node_in_tips_7': ' 1', 'node_in_ns_8': ' 0', 'node_roots_4': 'ERR1869535', 'node_all_tips': ' 1', 'node_all_tips_3': ' 1', 'node_size_6': 200, 'node_root_dates_6': '10.486625, 7.031396999999998, 13.071569', 'node_root_dates_5': '10.486625, 7.031396999999998', 'node_fontsize_4': 80, 'node_fontsize': 80, 'node_in_tips_8': ' 1', 'node_fontsize_6': 80, 'node_meta': 1, 'id': 7, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 5542.0, 'node_y': 1300.0}, 'classes': 'Germany'}, {'data': {'node_in_ns_6': ' 1', 'node_all_tips_8': ' 2', 'node_all_tips_7': ' 2', 'node_fontsize_8': 89, 'node_roots_8': 'n71', 'node_size_7': 282, 'node_in_tips_7': ' 2', 'node_root_dates_7': '12.100024', 'node_fontsize_7': 89, 'node_in_ns_8': ' 1', 'node_name_6': 'Ireland 2', 'node_roots_5': 'n71', 'node_name_7': 'Ireland 2', 'node_size_5': 200, 'node_all_tips': ' 2', 'node_in_tips_6': ' 2', 'node_in_tips': ' 2', 'node_size_6': 282, 'mile': 5, 'node_root_id': 'n71', 'node_root_dates_8': '12.100024', 'node_root_date': 12.100024, 'node_root_dates_6': '12.100024', 'node_all_tips_5': ' 1', 'node_root_dates_5': '12.100024', 'node_size_8': 282, 'node_fontsize_5': 80, 'node_root_dates': '12.100024', 'node_fontsize': 89, 'node_all_tips_6': ' 2', 'node_name_8': 'Ireland 2', 'node_name_5': 'Ireland 1', 'node_in_tips_5': ' 1', 'node_size': 282, 'node_in_tips_8': ' 2', 'node_roots': 'n71', 'node_roots_6': 'n71', 'node_in_ns_7': ' 1', 'node_fontsize_6': 89, 'node_in_ns_5': ' 1', 'node_in_ns': ' 1', 'node_roots_7': 'n71', 'node_name': 'Ireland 2', 'id': 8, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 6183.0, 'node_y': 1341.0}, 'classes': 'Ireland'}, {'data': {'node_in_ns_6': ' 5', 'node_all_tips_8': ' 11', 'node_name_4': 'Japan 2', 'node_all_tips_7': ' 11', 'node_fontsize_8': 108, 'node_roots_8': 'n102102', 'node_size_7': 445, 'node_in_tips_7': ' 5', 'node_root_dates_7': '8.050896', 'node_fontsize_7': 108, 'node_in_ns_8': ' 8', 'node_name_6': 'Japan 3', 'node_roots_5': 'n102102', 'node_name_7': 'Japan 5', 'node_roots_4': 'n102102', 'node_size_5': 282, 'node_all_tips': ' 11', 'node_in_tips_6': ' 3', 'node_in_tips': ' 5', 'node_size_6': 345, 'mile': 4, 'node_root_id': 'n102102', 'node_root_dates_8': '8.050896', 'node_root_date': 8.050896, 'node_root_dates_6': '8.050896', 'node_all_tips_5': ' 7', 'node_root_dates_5': '8.050896', 'node_size_8': 445, 'node_fontsize_5': 89, 'node_root_dates': '8.050896', 'node_fontsize_4': 89, 'node_all_tips_4': ' 3', 'node_fontsize': 108, 'node_in_tips_4': ' 2', 'node_all_tips_6': ' 8', 'node_name_8': 'Japan 5', 'node_name_5': 'Japan 2', 'node_in_tips_5': ' 2', 'node_size': 445, 'node_in_tips_8': ' 5', 'node_roots': 'n102102', 'node_root_dates_4': '8.050896', 'node_roots_6': 'n102102', 'node_in_ns_7': ' 8', 'node_in_ns_4': ' 4', 'node_fontsize_6': 96, 'node_in_ns_5': ' 5', 'node_size_4': 282, 'node_in_ns': ' 8', 'node_roots_7': 'n102102', 'node_name': 'Japan 5', 'id': 9, 'tooltip': 'geo_loc_name_country: Japan', 'node_x': 6865.0, 'node_y': 1422.5}, 'classes': 'Japan'}, {'data': {'node_all_tips_8': ' 1', 'node_all_tips_7': ' 1', 'node_meta_8': 1, 'node_fontsize_8': 80, 'node_roots_8': 'ERR2759450, ERR2759452', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_dates_7': '20.807361999999998', 'node_fontsize_7': 80, 'node_in_ns_8': ' 0', 'node_name_7': 'Netherlands 1', 'node_all_tips': ' 1', 'node_in_tips': ' 1', 'mile': 7, 'node_root_id': 'ERR2759452', 'node_root_dates_8': '40.070645, 20.807361999999998', 'node_root_date': 20.807361999999998, 'node_size_8': 200, 'node_root_dates': '40.070645, 20.807361999999998', 'node_fontsize': 80, 'node_name_8': 'Netherlands 1', 'node_size': 200, 'node_in_tips_8': ' 1', 'node_roots': 'ERR2759450, ERR2759452', 'node_in_ns_7': ' 0', 'node_in_ns': ' 0', 'node_meta': 1, 'node_roots_7': 'ERR2759452', 'node_name': 'Netherlands 1', 'id': 10, 'tip': 1, 'tooltip': 'geo_loc_name_country: Netherlands', 'node_x': 7669.0, 'node_y': 1300.0}, 'classes': 'Netherlands'}, {'data': {'node_root_dates_2': '6.0233919999999985, 4.018097999999999, 4.015662', 'node_name_4': 'Singapore 1-4', 'node_in_tips_1': ' 1-2', 'node_roots_8': 'SRR14719138, SRR14719181, SRR14719202, n45, n6868, n8', 'node_fontsize_7': 108, 'node_name_7': 'Singapore 1-5', 'node_meta_1': 1, 'node_name_2': 'Singapore 1-2', 'node_root_id': 'n8', 'node_root_dates_8': '53.477583, 6.0233919999999985, 10.048758999999999, 5.696607, 4.018097999999999, 4.015662', 'node_root_date': 4.015662, 'node_in_ns_2': ' 0-3', 'node_size_8': 445, 'node_name_8': 'Singapore 1-5', 'node_roots_3': 'SRR14719181, n6868, n8', 'node_name_3': 'Singapore 1-4', 'node_roots_1': 'SRR14719181, n6868', 'node_size_4': 398, 'node_in_ns': ' 0-4', 'node_roots_7': 'SRR14719181, SRR14719202, n45, n6868, n8', 'node_in_tips_4': ' 1-4', 'node_in_ns_6': ' 0-4', 'node_all_tips_8': ' 1-5', 'node_meta_2': 1, 'node_name_1': 'Singapore 1-2', 'node_meta_3': 1, 'node_root_dates_7': '6.0233919999999985, 10.048758999999999, 5.696607, 4.018097999999999, 4.015662', 'node_name_6': 'Singapore 1-5', 'node_fontsize_0': 80, 'node_size_5': 445, 'node_fontsize_1': 89, 'node_in_tips': ' 1-5', 'mile': 0, 'node_all_tips_5': ' 1-5', 'node_all_tips_4': ' 1-4', 'node_in_ns_0': ' 3', 'node_all_tips_6': ' 1-5', 'node_name_5': 'Singapore 1-5', 'node_in_ns_1': ' 0-3', 'node_name_0': 'Singapore 1', 'node_root_dates_3': '6.0233919999999985, 4.018097999999999, 4.015662', 'node_roots': 'SRR14719138, SRR14719181, SRR14719202, n45, n6868, n8', 'node_size_0': 200, 'node_roots_6': 'SRR14719181, SRR14719202, n45, n6868, n8', 'node_in_tips_3': ' 1-4', 'node_in_ns_7': ' 0-4', 'node_in_ns_5': ' 0-4', 'node_meta_4': 1, 'node_in_tips_2': ' 1-2', 'node_name': 'Singapore 1-5', 'node_size_2': 282, 'node_all_tips_7': ' 1-5', 'node_meta_6': 1, 'node_all_tips_1': ' 1-2', 'node_meta_8': 1, 'node_fontsize_8': 108, 'node_size_7': 445, 'node_meta_5': 1, 'node_roots_5': 'SRR14719181, SRR14719202, n45, n6868, n8', 'node_size_3': 398, 'node_in_tips_6': ' 1-5', 'node_all_tips_2': ' 1-2', 'node_in_ns_3': ' 0-4', 'node_fontsize_5': 108, 'node_root_dates': '53.477583, 6.0233919999999985, 10.048758999999999, 5.696607, 4.018097999999999, 4.015662', 'node_roots_0': 'n6868', 'node_in_tips_5': ' 1-5', 'node_size': 445, 'node_size_1': 282, 'node_root_dates_4': '6.0233919999999985, 10.048758999999999, 5.696607, 4.018097999999999, 4.015662', 'node_roots_2': 'SRR14719181, n6868, n8', 'node_fontsize_3': 102, 'node_meta_7': 1, 'node_in_ns_4': ' 0-4', 'node_fontsize_2': 89, 'node_in_tips_7': ' 1-5', 'node_in_ns_8': ' 0-4', 'node_roots_4': 'SRR14719181, SRR14719202, n45, n6868, n8', 'node_all_tips': ' 1-5', 'node_all_tips_3': ' 1-4', 'node_size_6': 445, 'node_root_dates_6': '6.0233919999999985, 10.048758999999999, 5.696607, 4.018097999999999, 4.015662', 'node_root_dates_5': '6.0233919999999985, 10.048758999999999, 5.696607, 4.018097999999999, 4.015662', 'node_fontsize_4': 102, 'node_fontsize': 108, 'node_in_tips_8': ' 1-5', 'node_root_dates_0': '4.018097999999999', 'node_all_tips_0': ' 1', 'node_fontsize_6': 108, 'node_in_tips_0': ' 1', 'node_meta': 1, 'node_root_dates_1': '6.0233919999999985, 4.018097999999999', 'id': 11, 'tip': 1, 'tooltip': 'geo_loc_name_country: Singapore', 'node_x': 8391.5, 'node_y': 1422.5}, 'classes': 'Singapore'}, {'data': {'node_in_ns_6': ' 7', 'node_all_tips_8': ' 14', 'node_name_4': 'Spain 4', 'node_all_tips_7': ' 14', 'node_fontsize_8': 108, 'node_roots_8': 'n5050', 'node_size_7': 445, 'node_in_tips_7': ' 5', 'node_root_dates_7': '5.029604', 'node_fontsize_7': 108, 'node_in_ns_8': ' 7', 'node_name_6': 'Spain 5', 'node_roots_5': 'n5050', 'node_name_7': 'Spain 5', 'node_roots_4': 'n5050', 'node_size_5': 398, 'node_all_tips': ' 14', 'node_in_tips_6': ' 5', 'node_in_tips': ' 5', 'node_size_6': 445, 'mile': 4, 'node_root_id': 'n5050', 'node_root_dates_8': '5.029604', 'node_root_date': 5.029604, 'node_root_dates_6': '5.029604', 'node_all_tips_5': ' 10', 'node_root_dates_5': '5.029604', 'node_size_8': 445, 'node_fontsize_5': 102, 'node_root_dates': '5.029604', 'node_fontsize_4': 102, 'node_all_tips_4': ' 4', 'node_fontsize': 108, 'node_in_tips_4': ' 4', 'node_all_tips_6': ' 12', 'node_name_8': 'Spain 5', 'node_name_5': 'Spain 4', 'node_in_tips_5': ' 4', 'node_size': 445, 'node_in_tips_8': ' 5', 'node_roots': 'n5050', 'node_root_dates_4': '5.029604', 'node_roots_6': 'n5050', 'node_in_ns_7': ' 7', 'node_in_ns_4': ' 6', 'node_fontsize_6': 108, 'node_in_ns_5': ' 7', 'node_size_4': 398, 'node_in_ns': ' 7', 'node_roots_7': 'n5050', 'node_name': 'Spain 5', 'id': 12, 'tooltip': 'geo_loc_name_country: Spain', 'node_x': 9547.25, 'node_y': 1422.5}, 'classes': 'Spain'}, {'data': {'node_root_dates_2': '6.299301999999999, 4.021200999999999', 'node_name_4': 'Taiwan 1', 'node_in_tips_1': ' 1', 'node_roots_8': 'DRR317509, DRR317512, DRR317514, DRR317567, DRR317575', 'node_fontsize_7': 80, 'node_name_7': 'Taiwan 1', 'node_name_2': 'Taiwan 1', 'node_root_id': 'DRR317514', 'node_root_dates_8': '15.564022999999999, 6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_root_date': 4.021200999999999, 'node_in_ns_2': ' 0', 'node_size_8': 200, 'node_name_8': 'Taiwan 1', 'node_roots_3': 'DRR317512, DRR317514, DRR317567, DRR317575', 'node_name_3': 'Taiwan 1', 'node_roots_1': 'DRR317514', 'node_size_4': 200, 'node_in_ns': ' 0', 'node_roots_7': 'DRR317509, DRR317512, DRR317514, DRR317567, DRR317575', 'node_in_tips_4': ' 1', 'node_in_ns_6': ' 0', 'node_all_tips_8': ' 1', 'node_meta_2': 1, 'node_name_1': 'Taiwan 1', 'node_meta_3': 1, 'node_root_dates_7': '15.564022999999999, 6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_name_6': 'Taiwan 1', 'node_size_5': 200, 'node_fontsize_1': 80, 'node_in_tips': ' 1', 'mile': 1, 'node_all_tips_5': ' 1', 'node_all_tips_4': ' 1', 'node_all_tips_6': ' 1', 'node_name_5': 'Taiwan 1', 'node_in_ns_1': ' 0', 'node_root_dates_3': '6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_roots': 'DRR317509, DRR317512, DRR317514, DRR317567, DRR317575', 'node_roots_6': 'DRR317509, DRR317512, DRR317514, DRR317567, DRR317575', 'node_in_tips_3': ' 1', 'node_in_ns_7': ' 0', 'node_in_ns_5': ' 0', 'node_meta_4': 1, 'node_in_tips_2': ' 1', 'node_name': 'Taiwan 1', 'node_size_2': 200, 'node_all_tips_7': ' 1', 'node_meta_6': 1, 'node_all_tips_1': ' 1', 'node_meta_8': 1, 'node_fontsize_8': 80, 'node_size_7': 200, 'node_meta_5': 1, 'node_roots_5': 'DRR317512, DRR317514, DRR317567, DRR317575', 'node_size_3': 200, 'node_in_tips_6': ' 1', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0', 'node_fontsize_5': 80, 'node_root_dates': '15.564022999999999, 6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_in_tips_5': ' 1', 'node_size': 200, 'node_size_1': 200, 'node_root_dates_4': '6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_roots_2': 'DRR317512, DRR317514', 'node_fontsize_3': 80, 'node_meta_7': 1, 'node_in_ns_4': ' 0', 'node_fontsize_2': 80, 'node_in_tips_7': ' 1', 'node_in_ns_8': ' 0', 'node_roots_4': 'DRR317512, DRR317514, DRR317567, DRR317575', 'node_all_tips': ' 1', 'node_all_tips_3': ' 1', 'node_size_6': 200, 'node_root_dates_6': '15.564022999999999, 6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_root_dates_5': '6.299301999999999, 4.021200999999999, 8.041316, 8.058887', 'node_fontsize_4': 80, 'node_fontsize': 80, 'node_in_tips_8': ' 1', 'node_fontsize_6': 80, 'node_meta': 1, 'node_root_dates_1': '4.021200999999999', 'id': 13, 'tip': 1, 'tooltip': 'geo_loc_name_country: Taiwan', 'node_x': 10683.0, 'node_y': 1300.0}, 'classes': 'Taiwan'}, {'data': {'node_in_ns_6': ' 9', 'node_all_tips_8': ' 14', 'node_all_tips_7': ' 8', 'node_fontsize_8': 132, 'node_roots_8': 'n9595', 'node_size_7': 526, 'node_in_tips_7': ' 7', 'node_root_dates_7': '8.24433', 'node_fontsize_7': 117, 'node_in_ns_8': ' 12', 'node_name_6': 'USA 6', 'node_name_7': 'USA 7', 'node_all_tips': ' 14', 'node_in_tips_6': ' 6', 'node_in_tips': ' 11', 'node_size_6': 487, 'mile': 6, 'node_root_id': 'n9595', 'node_root_dates_8': '8.24433', 'node_root_date': 8.24433, 'node_root_dates_6': '8.24433', 'node_size_8': 659, 'node_root_dates': '8.24433', 'node_fontsize': 132, 'node_all_tips_6': ' 7', 'node_name_8': 'USA 11', 'node_size': 659, 'node_in_tips_8': ' 11', 'node_roots': 'n9595', 'node_roots_6': 'n9595', 'node_in_ns_7': ' 9', 'node_fontsize_6': 112, 'node_in_ns': ' 12', 'node_roots_7': 'n9595', 'node_name': 'USA 11', 'id': 14, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 11324.0, 'node_y': 1529.5}, 'classes': 'USA'}, {'data': {'node_root_dates_2': '5.025671999999998, 6.029365999999998, 6.06905', 'node_name_4': 'USA 1-6', 'node_in_tips_1': ' 1', 'node_roots_8': 'SRR12051591, SRR30795523, SRR7800730, n19, n7272', 'node_fontsize_7': 117, 'node_name_7': 'USA 1-7', 'node_name_2': 'USA 1', 'node_root_id': 'SRR30795523', 'node_root_dates_8': '5.025671999999998, 6.029365999999998, 6.06905, 10.057123999999998, 7.050331', 'node_root_date': 6.029365999999998, 'node_in_ns_2': ' 0', 'node_size_8': 526, 'node_name_8': 'USA 1-7', 'node_roots_3': 'SRR12051591, SRR30795523, SRR7800730, n7272', 'node_name_3': 'USA 1-4', 'node_roots_1': 'SRR12051591', 'node_size_4': 487, 'node_in_ns': ' 0-6', 'node_roots_7': 'SRR12051591, SRR30795523, SRR7800730, n19, n7272', 'node_in_tips_4': ' 1-6', 'node_in_ns_6': ' 0-6', 'node_all_tips_8': ' 1-7', 'node_meta_2': 1, 'node_name_1': 'USA 1', 'node_meta_3': 1, 'node_root_dates_7': '5.025671999999998, 6.029365999999998, 6.06905, 10.057123999999998, 7.050331', 'node_name_6': 'USA 1-7', 'node_size_5': 526, 'node_fontsize_1': 80, 'node_in_tips': ' 1-7', 'mile': 1, 'node_all_tips_5': ' 1-7', 'node_all_tips_4': ' 1-6', 'node_all_tips_6': ' 1-7', 'node_name_5': 'USA 1-7', 'node_in_ns_1': ' 0', 'node_root_dates_3': '5.025671999999998, 6.029365999999998, 6.06905, 7.050331', 'node_roots': 'SRR12051591, SRR30795523, SRR7800730, n19, n7272', 'node_roots_6': 'SRR12051591, SRR30795523, SRR7800730, n19, n7272', 'node_in_tips_3': ' 1-4', 'node_in_ns_7': ' 0-6', 'node_in_ns_5': ' 0-6', 'node_meta_4': 1, 'node_in_tips_2': ' 1', 'node_name': 'USA 1-7', 'node_size_2': 200, 'node_all_tips_7': ' 1-7', 'node_meta_6': 1, 'node_all_tips_1': ' 1', 'node_meta_8': 1, 'node_fontsize_8': 117, 'node_size_7': 526, 'node_meta_5': 1, 'node_roots_5': 'SRR12051591, SRR30795523, SRR7800730, n19, n7272', 'node_size_3': 398, 'node_in_tips_6': ' 1-7', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0-5', 'node_fontsize_5': 117, 'node_root_dates': '5.025671999999998, 6.029365999999998, 6.06905, 10.057123999999998, 7.050331', 'node_in_tips_5': ' 1-7', 'node_size': 526, 'node_size_1': 200, 'node_root_dates_4': '5.025671999999998, 6.029365999999998, 6.06905, 10.057123999999998, 7.050331', 'node_roots_2': 'SRR12051591, SRR30795523, SRR7800730', 'node_fontsize_3': 102, 'node_meta_7': 1, 'node_in_ns_4': ' 0-6', 'node_fontsize_2': 80, 'node_in_tips_7': ' 1-7', 'node_in_ns_8': ' 0-6', 'node_roots_4': 'SRR12051591, SRR30795523, SRR7800730, n19, n7272', 'node_all_tips': ' 1-7', 'node_all_tips_3': ' 1-4', 'node_size_6': 526, 'node_root_dates_6': '5.025671999999998, 6.029365999999998, 6.06905, 10.057123999999998, 7.050331', 'node_root_dates_5': '5.025671999999998, 6.029365999999998, 6.06905, 10.057123999999998, 7.050331', 'node_fontsize_4': 112, 'node_fontsize': 117, 'node_in_tips_8': ' 1-7', 'node_fontsize_6': 117, 'node_meta': 1, 'node_root_dates_1': '5.025671999999998', 'id': 15, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 12505.0, 'node_y': 1463.0}, 'classes': 'USA'}, {'data': {'node_in_ns_6': ' 1', 'node_all_tips_8': ' 3', 'node_all_tips_7': ' 3', 'node_fontsize_8': 80, 'node_roots_8': 'n105', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_dates_7': '12.068841', 'node_fontsize_7': 80, 'node_in_ns_8': ' 1', 'node_name_6': 'Spain 1', 'node_roots_5': 'n105', 'node_name_7': 'Spain 1', 'node_size_5': 200, 'node_all_tips': ' 3', 'node_in_tips_6': ' 1', 'node_in_tips': ' 1', 'node_size_6': 200, 'mile': 5, 'node_root_id': 'n105', 'node_root_dates_8': '12.068841', 'node_root_date': 12.068841, 'node_root_dates_6': '12.068841', 'node_all_tips_5': ' 3', 'node_root_dates_5': '12.068841', 'node_size_8': 200, 'node_fontsize_5': 80, 'node_root_dates': '12.068841', 'node_fontsize': 80, 'node_all_tips_6': ' 3', 'node_name_8': 'Spain 1', 'node_name_5': 'Spain 1', 'node_in_tips_5': ' 1', 'node_size': 200, 'node_in_tips_8': ' 1', 'node_roots': 'n105', 'node_roots_6': 'n105', 'node_in_ns_7': ' 1', 'node_fontsize_6': 80, 'node_in_ns_5': ' 1', 'node_in_ns': ' 1', 'node_roots_7': 'n105', 'node_name': 'Spain 1', 'id': 16, 'tooltip': 'geo_loc_name_country: Spain', 'node_x': 6865.0, 'node_y': 2145.0}, 'classes': 'Spain'}, {'data': {'node_all_tips_8': ' 2', 'node_all_tips_7': ' 2', 'node_fontsize_8': 89, 'node_roots_8': 'n54', 'node_size_7': 282, 'node_in_tips_7': ' 2', 'node_root_dates_7': '21.386409999999998', 'node_fontsize_7': 89, 'node_in_ns_8': ' 1', 'node_name_7': 'Germany 2', 'node_all_tips': ' 2', 'node_in_tips': ' 2', 'mile': 7, 'node_root_id': 'n54', 'node_root_dates_8': '21.386409999999998', 'node_root_date': 21.386409999999998, 'node_size_8': 282, 'node_root_dates': '21.386409999999998', 'node_fontsize': 89, 'node_name_8': 'Germany 2', 'node_size': 282, 'node_in_tips_8': ' 2', 'node_roots': 'n54', 'node_in_ns_7': ' 1', 'node_in_ns': ' 1', 'node_roots_7': 'n54', 'node_name': 'Germany 2', 'id': 17, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 9155.0, 'node_y': 2186.0}, 'classes': 'Germany'}, {'data': {'node_in_ns_6': ' 5', 'node_all_tips_8': ' 6', 'node_all_tips_7': ' 6', 'node_fontsize_8': 112, 'node_roots_8': 'n5151', 'node_size_7': 487, 'node_in_tips_7': ' 6', 'node_root_dates_7': '11.149286', 'node_fontsize_7': 112, 'node_in_ns_8': ' 5', 'node_name_6': 'Netherlands 6', 'node_roots_5': 'n5151', 'node_name_7': 'Netherlands 6', 'node_size_5': 445, 'node_all_tips': ' 6', 'node_in_tips_6': ' 6', 'node_in_tips': ' 6', 'node_size_6': 487, 'mile': 5, 'node_root_id': 'n5151', 'node_root_dates_8': '11.149286', 'node_root_date': 11.149286, 'node_root_dates_6': '11.149286', 'node_all_tips_5': ' 5', 'node_root_dates_5': '11.149286', 'node_size_8': 487, 'node_fontsize_5': 108, 'node_root_dates': '11.149286', 'node_fontsize': 112, 'node_all_tips_6': ' 6', 'node_name_8': 'Netherlands 6', 'node_name_5': 'Netherlands 5', 'node_in_tips_5': ' 5', 'node_size': 487, 'node_in_tips_8': ' 6', 'node_roots': 'n5151', 'node_roots_6': 'n5151', 'node_in_ns_7': ' 5', 'node_fontsize_6': 112, 'node_in_ns_5': ' 5', 'node_in_ns': ' 5', 'node_roots_7': 'n5151', 'node_name': 'Netherlands 6', 'id': 18, 'tip': 1, 'tooltip': 'geo_loc_name_country: Netherlands', 'node_x': 9939.5, 'node_y': 2288.5}, 'classes': 'Netherlands'}, {'data': {'node_all_tips_8': ' 2', 'node_fontsize_8': 89, 'node_roots_8': 'n102', 'node_in_ns_8': ' 1', 'node_all_tips': ' 2', 'node_in_tips': ' 2', 'mile': 8, 'node_root_id': 'n102', 'node_root_dates_8': '26.114355', 'node_root_date': 26.114355, 'node_size_8': 282, 'node_root_dates': '26.114355', 'node_fontsize': 89, 'node_name_8': 'UK 2', 'node_size': 282, 'node_in_tips_8': ' 2', 'node_roots': 'n102', 'node_in_ns': ' 1', 'node_name': 'UK 2', 'id': 19, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 11324.0, 'node_y': 2400.0}, 'classes': 'UK'}, {'data': {'node_in_ns_6': ' 1', 'node_all_tips_8': ' 2', 'node_all_tips_7': ' 2', 'node_fontsize_8': 89, 'node_roots_8': 'n105105', 'node_size_7': 282, 'node_in_tips_7': ' 2', 'node_root_dates_7': '13.070107', 'node_fontsize_7': 89, 'node_in_ns_8': ' 1', 'node_name_6': 'UK 2', 'node_roots_5': 'n105105', 'node_name_7': 'UK 2', 'node_size_5': 282, 'node_all_tips': ' 2', 'node_in_tips_6': ' 2', 'node_in_tips': ' 2', 'node_size_6': 282, 'mile': 5, 'node_root_id': 'n105105', 'node_root_dates_8': '13.070107', 'node_root_date': 13.070107, 'node_root_dates_6': '13.070107', 'node_all_tips_5': ' 2', 'node_root_dates_5': '13.070107', 'node_size_8': 282, 'node_fontsize_5': 89, 'node_root_dates': '13.070107', 'node_fontsize': 89, 'node_all_tips_6': ' 2', 'node_name_8': 'UK 2', 'node_name_5': 'UK 2', 'node_in_tips_5': ' 2', 'node_size': 282, 'node_in_tips_8': ' 2', 'node_roots': 'n105105', 'node_roots_6': 'n105105', 'node_in_ns_7': ' 1', 'node_fontsize_6': 89, 'node_in_ns_5': ' 1', 'node_in_ns': ' 1', 'node_roots_7': 'n105105', 'node_name': 'UK 2', 'id': 20, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6865.0, 'node_y': 2786.0}, 'classes': 'UK'}], 'edges': [{'data': {'source': 0, 'target': 1, 'edge_name_3': '2', 'edge_size_8': 83, 'edge_size_4': 66, 'edge_name_1': '2', 'edge_size_6': 83, 'edge_size': 83, 'edge_name': '3', 'mile': 1, 'edge_size_3': 66, 'edge_name_2': '2', 'edge_size_1': 66, 'edge_name_7': '3', 'edge_name_6': '3', 'edge_name_8': '3', 'edge_name_5': '2', 'edge_size_2': 66, 'edge_size_5': 66, 'edge_size_7': 83, 'edge_name_4': '2'}}, {'data': {'source': 0, 'target': 2, 'edge_name_8': '', 'edge_size_8': 50, 'mile': 7, 'edge_name_7': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_name': ''}}, {'data': {'source': 0, 'target': 3, 'edge_name_3': '', 'edge_size_8': 66, 'edge_size_4': 50, 'edge_size_6': 66, 'edge_size': 66, 'edge_name': '2', 'mile': 3, 'edge_size_3': 50, 'edge_name_7': '2', 'edge_name_6': '2', 'edge_name_8': '2', 'edge_name_5': '2', 'edge_size_5': 66, 'edge_size_7': 66, 'edge_name_4': ''}}, {'data': {'source': 0, 'target': 4, 'edge_name_3': '4', 'edge_size_8': 150, 'edge_size_4': 133, 'edge_name_1': '', 'edge_size_6': 150, 'edge_size': 150, 'edge_name': '7', 'mile': 1, 'edge_size_3': 100, 'edge_name_2': '3', 'edge_size_1': 50, 'edge_name_7': '7', 'edge_name_6': '7', 'edge_name_8': '7', 'edge_name_5': '7', 'edge_size_2': 83, 'edge_size_5': 150, 'edge_size_7': 150, 'edge_name_4': '6'}}, {'data': {'source': 0, 'target': 5, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'mile': 5, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}, {'data': {'source': 0, 'target': 6, 'edge_name_3': '', 'edge_size_8': 50, 'edge_size_4': 50, 'edge_name_1': '', 'edge_size_6': 50, 'edge_size': 50, 'edge_name': '', 'mile': 1, 'edge_size_3': 50, 'edge_name_2': '', 'edge_size_1': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_name_8': '', 'edge_name_5': '', 'edge_size_2': 50, 'edge_size_5': 50, 'edge_size_7': 50, 'edge_name_4': ''}}, {'data': {'source': 0, 'target': 7, 'edge_name_3': '', 'edge_size_8': 83, 'edge_size_4': 50, 'edge_size_6': 83, 'edge_size': 83, 'edge_name': '3', 'mile': 2, 'edge_size_3': 50, 'edge_name_2': '', 'edge_name_7': '3', 'edge_name_6': '3', 'edge_name_8': '3', 'edge_name_5': '2', 'edge_size_2': 50, 'edge_size_5': 66, 'edge_size_7': 83, 'edge_name_4': ''}}, {'data': {'source': 0, 'target': 8, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'mile': 5, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}, {'data': {'source': 0, 'target': 9, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'edge_size_4': 50, 'edge_name_4': '', 'mile': 4, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}, {'data': {'source': 0, 'target': 10, 'edge_name_8': '2', 'edge_size_8': 66, 'mile': 7, 'edge_name_7': '', 'edge_size': 66, 'edge_size_7': 50, 'edge_name': '2'}}, {'data': {'source': 0, 'target': 11, 'edge_name_3': '3', 'edge_size_8': 133, 'edge_size_4': 116, 'edge_name_1': '2', 'edge_size_6': 116, 'edge_size': 133, 'edge_name': '6', 'mile': 0, 'edge_size_3': 83, 'edge_name_2': '3', 'edge_size_1': 66, 'edge_name_7': '5', 'edge_name_6': '5', 'edge_name_0': '', 'edge_name_8': '6', 'edge_size_0': 50, 'edge_name_5': '5', 'edge_size_2': 83, 'edge_size_5': 116, 'edge_size_7': 116, 'edge_name_4': '5'}}, {'data': {'source': 0, 'target': 12, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'edge_size_4': 50, 'edge_name_4': '', 'mile': 4, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}, {'data': {'source': 0, 'target': 13, 'edge_name_3': '4', 'edge_size_8': 116, 'edge_size_4': 100, 'edge_name_1': '', 'edge_size_6': 116, 'edge_size': 116, 'edge_name': '5', 'mile': 1, 'edge_size_3': 100, 'edge_name_2': '2', 'edge_size_1': 50, 'edge_name_7': '5', 'edge_name_6': '5', 'edge_name_8': '5', 'edge_name_5': '4', 'edge_size_2': 66, 'edge_size_5': 100, 'edge_size_7': 116, 'edge_name_4': '4'}}, {'data': {'source': 0, 'target': 14, 'edge_name_8': '', 'edge_size_8': 50, 'mile': 6, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_name': ''}}, {'data': {'source': 0, 'target': 15, 'edge_name_3': '4', 'edge_size_8': 116, 'edge_size_4': 116, 'edge_name_1': '', 'edge_size_6': 116, 'edge_size': 116, 'edge_name': '5', 'mile': 1, 'edge_size_3': 100, 'edge_name_2': '3', 'edge_size_1': 50, 'edge_name_7': '5', 'edge_name_6': '5', 'edge_name_8': '5', 'edge_name_5': '5', 'edge_size_2': 83, 'edge_size_5': 116, 'edge_size_7': 116, 'edge_name_4': '5'}}, {'data': {'source': 9, 'target': 16, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'mile': 5, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}, {'data': {'source': 12, 'target': 17, 'edge_name_8': '', 'edge_size_8': 50, 'mile': 7, 'edge_name_7': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_name': ''}}, {'data': {'source': 12, 'target': 18, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'mile': 5, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}, {'data': {'source': 14, 'target': 19, 'edge_name_8': '', 'edge_size_8': 50, 'mile': 8, 'edge_size': 50, 'edge_name': ''}}, {'data': {'source': 16, 'target': 20, 'edge_name_8': '', 'edge_name_5': '', 'edge_size_8': 50, 'mile': 5, 'edge_size_6': 50, 'edge_name_7': '', 'edge_name_6': '', 'edge_size': 50, 'edge_size_7': 50, 'edge_size_5': 50, 'edge_name': ''}}]},
+
+  layout: layoutOptions,
+
+  ready: function(){
+    window.cy = this;
+  }
+});
+
+function addQtips() {
+    cy.filter(function(ele, i, eles) {
+        return ele.isNode() && ele.data('tooltip') !== undefined;
+    } ).qtip({
+        content: function(){
+                var tooltip = '<br><div style="overflow: auto;"><span style="white-space:nowrap;">' + this.data('tooltip') + '</span></div>';
+                if (this.data('node_meta') !== undefined) {
+                    tooltip += '<br><div style="overflow: auto;"><span style="white-space:nowrap;">ids: ' + this.data('node_roots') + '</span></div>';
+                    tooltip += '<br><div style="overflow: auto;"><span style="white-space:nowrap;">dist. to root: ' + this.data('node_root_dates') + '</span></div>';
+                } else {
+                    tooltip += '<br>id: ' + this.data('node_roots') + '<br>';
+                    tooltip += '<br>dist. to root: ' + this.data('node_root_dates') + '<br>';
+                }
+                tooltip += '<br>samples inside: ' + this.data('node_in_tips');
+                tooltip += '<br>total samples in the subtree (inc. trimmed): ' + this.data('node_all_tips');
+                tooltip += '<br>diversification events inside: ' + this.data('node_in_ns');
+                return tooltip;
+            },
+        show: {event: 'mouseover'},
+        hide: {event: 'mouseout'},
+        style: {classes: 'qtip-bootstrap'},
+        position: {at: 'center bottom'}
+    });
+}
+
+cy.minZoom(.001);
+cy.maxZoom(20);
+addQtips();
+
+
+function toImage(){
+    document.getElementById("downloader").href = cy.jpg({ full: false, quality: 1.0, scale: 2}).replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}
+
+function saveAsSvg() {
+    var svgContent = cy.svg({scale: 1, full: true});
+    var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+    document.getElementById("downloader_svg").href = URL.createObjectURL(blob);
+}
+
+function fit() {
+    cy.fit();
+}
+
+function resetLayout() {
+    cy.startBatch();
+    cy.layout(layoutOptions).run();
+    if (removed !== undefined) {
+        removed.forEach(function( ele ) {
+            if (ele.data('node_x') !== undefined) {
+                ele.position('x', ele.data('node_x'));
+                ele.position('y', ele.data('node_y'));
+            }
+        });
+    }
+    cy.endBatch();
+}
+
+var years = ['4.02091', '6.02339', '7.0337', '9.03121', '10.1205', '13.071', '16.2251', '21.759', '53.4776'];
+var slider = document.getElementById("myRange");
+if (slider !== null) {
+    var output = document.getElementById("demo");
+    output.innerHTML = years[slider.value]; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    var removed = cy.collection();
+
+    slider.oninput = function() {
+        var mile = this.value;
+        output.innerHTML = years[mile];
+
+        cy.startBatch();
+        removed.restore();
+        removed = cy.remove("[mile>" + mile + "]");
+        cy.$("").forEach(function( ele ) {
+            if (ele.data('node_name_' + mile) !== undefined) {
+                ele.data('node_name', ele.data('node_name_' + mile));
+            }
+            if (ele.data('node_roots_' + mile) !== undefined) {
+                ele.data('node_roots', ele.data('node_roots_' + mile));
+            }
+            if (ele.data('node_root_dates_' + mile) !== undefined) {
+                ele.data('node_root_dates', ele.data('node_root_dates_' + mile));
+            }
+            if (ele.data('node_fontsize_' + mile) !== undefined) {
+                ele.data('node_fontsize', ele.data('node_fontsize_' + mile));
+            }
+            if (ele.data('node_in_tips_' + mile) !== undefined) {
+                ele.data('node_in_tips', ele.data('node_in_tips_' + mile));
+            }
+            if (ele.data('node_in_ns_' + mile) !== undefined) {
+                ele.data('node_in_ns', ele.data('node_in_ns_' + mile));
+            }
+            if (ele.data('node_all_tips_' + mile) !== undefined) {
+                ele.data('node_all_tips', ele.data('node_all_tips_' + mile));
+            }
+            if (ele.data('node_size_' + mile) !== undefined) {
+                ele.data('node_size', ele.data('node_size_' + mile));
+            }
+            if (ele.data('edge_name_' + mile) !== undefined) {
+                ele.data('edge_name', ele.data('edge_name_' + mile));
+            }
+            if (ele.data('edge_size_' + mile) !== undefined) {
+                ele.data('edge_size', ele.data('edge_size_' + mile));
+            }
+            if (ele.data('node_meta_' + mile) !== undefined) {
+                ele.data('node_meta', ele.data('node_meta_' + mile));
+            } else if (ele.data('node_meta') !== undefined) {
+                ele.removeData('node_meta');
+            }
+        });
+        cy.endBatch();
+    }
+}
+
+function toggleFullScreen() {
+  var elem = document.getElementById("fullscreenDiv");
+  if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+   (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (elem.requestFullScreen) {
+      elem.requestFullScreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullScreen) {
+      elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-resize-small"
+    document.getElementById("fstext").innerHTML = "  Exit full screen"
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-fullscreen"
+    document.getElementById("fstext").innerHTML = "  Full screen"
+  }
+}</script>
+</body>
+</html>

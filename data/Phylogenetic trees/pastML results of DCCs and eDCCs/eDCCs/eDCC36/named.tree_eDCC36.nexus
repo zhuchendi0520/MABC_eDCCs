@@ -1,0 +1,8 @@
+#NEXUS
+Begin Taxa;
+ Dimensions NTax=6;
+ TaxLabels DRR317500 DRR317581 DRR317413 DRR317463 DRR317450 ERR7253664;
+End;
+Begin Trees;
+ Tree tree1=((DRR317500:21.84380[&date=103.476871,geo_loc_name_country=Taiwan],DRR317581:13.50000[&date=95.133013,geo_loc_name_country=Taiwan])Node_1:81.63300[&date=81.633026,geo_loc_name_country=Taiwan],((DRR317413:19.67170[&date=84.71306,geo_loc_name_country=Japan],(DRR317463:10.07170[&date=102.934318,geo_loc_name_country=Japan],DRR317450:3.43876[&date=96.301334,geo_loc_name_country=Japan])Node_2:27.82120[&date=92.862578,geo_loc_name_country=Japan])Node_4:8.16240[&date=65.041393,geo_loc_name_country=Japan],ERR7253664:19.26700[&date=76.146024,geo_loc_name_country=Germany])Node_6:56.87900[&date=56.878994,geo_loc_name_country=Japan])Node_7:0.00000[&date=0,geo_loc_name_country=Japan];
+End;

@@ -1,0 +1,8 @@
+#NEXUS
+Begin Taxa;
+ Dimensions NTax=8;
+ TaxLabels ERR4020093 ERR4020067 ERR459967 SRR18969517 ERR114974 ERR115104 ERR114986 ERR115102;
+End;
+Begin Trees;
+ Tree tree1=((ERR4020093:4.61106[&date=17.124786,geo_loc_name_country=Ireland],(ERR4020067:2.01539[&date=16.096024,geo_loc_name_country=Ireland],ERR459967:0.00014[&date=14.080776,geo_loc_name_country=Ireland])n00:1.56691[&date=14.080634,geo_loc_name_country=Ireland])n0:12.51370[&date=12.513722,geo_loc_name_country=Ireland],(SRR18969517:23.53880[&date=31.611183,geo_loc_name_country=China],(ERR114974:5.39750[&date=23.902209,geo_loc_name_country=UK],(ERR115104:3.07451[&date=24.579662,geo_loc_name_country=UK],(ERR114986:0.00014[&date=25.833667000000002,geo_loc_name_country=UK],ERR115102:0.00014[&date=25.833667000000002,geo_loc_name_country=UK])n22:4.32837[&date=25.833525,geo_loc_name_country=UK])n2:3.00045[&date=21.505156,geo_loc_name_country=UK])n11:10.43230[&date=18.504708,geo_loc_name_country=UK])n1:8.07240[&date=8.072395,geo_loc_name_country=UK])root:0.00000[&date=0,geo_loc_name_country=Ireland];
+End;

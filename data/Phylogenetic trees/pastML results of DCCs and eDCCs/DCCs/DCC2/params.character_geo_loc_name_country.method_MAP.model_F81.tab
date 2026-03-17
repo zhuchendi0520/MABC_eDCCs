@@ -1,0 +1,23 @@
+parameter	value
+pastml_version	1.9.34
+character	geo_loc_name_country
+log_likelihood	-264.5861529959478
+log_likelihood_restricted_MAP	-271.47873598128484
+method	MAP
+model	F81
+num_nodes	1653
+num_tips	827
+scaling_factor	0.013924162758865105
+smoothing_factor	0
+state_changes_per_avg_branch	0.042669997698395884
+Australia	0.05944219818264919
+Canada	0.044025262611870106
+Czech Republic	0.010847706605357546
+Denmark	0.03224679501102566
+Germany	0.049841203055597416
+Ireland	0.07588669514435985
+Netherlands	0.06513923683126238
+Spain	0.01064698120907699
+Sweden	0.02150360373675899
+UK	0.6113069449719875
+USA	0.019113372640054502

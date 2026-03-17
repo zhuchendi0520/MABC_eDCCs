@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: helvetica,serif;
+  font-size: 14px;
+}
+
+#cy {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+}
+
+h1 {
+  opacity: 0.5;
+  font-size: 1em;
+}
+
+.floating {
+    max-width: 30%;
+    width: 120px;
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.cy-button {
+    background-color: #555555;
+    border: none;
+    color: white;
+    padding: 6px 0px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+a.cy-button:link, a.cy-button:visited, a.cy-button:hover {
+    color: white;
+    text-decoration: none;
+}
+
+
+.slidertext {
+    width: 100%;
+    color: #555555;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    text-align: center;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    margin: 10px 0px;
+    display: inline-block;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+@media all and (max-width: 600px) {
+    .buttontext {
+        display: none;
+    }
+}
+
+
+</style>
+<meta charset=utf-8 />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+<title>a635b569-bc36-424b-96e6-2d4d75ce0301.full</title>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.qtip.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-qtip.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-svg.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/layout-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cose-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-cose-bilkent.min.js"></script>
+    
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/jquery.qtip.min.css"/>
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/bootstrap.min.css"/>
+    
+<meta http-Equiv="Cache-Control" Content="no-cache" />
+<meta http-Equiv="Pragma" Content="no-cache" />
+<meta http-Equiv="Expires" Content="0" />
+</head>
+<body>
+<div id="fullscreenDiv">
+<div id="cy"></div>
+<div class="floating">
+    <a class="cy-button" href="#" id="fit" onclick="fit()">
+        <span class="glyphicon glyphicon-resize-full"></span><span class="buttontext">  Fit screen</span>
+    </a>
+    <a class="cy-button" href="#" id="reset" onclick="resetLayout()">
+        <span class="glyphicon glyphicon-picture"></span><span class="buttontext">  Restore layout</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader" onclick="toImage()" download="a635b569-bc36-424b-96e6-2d4d75ce0301.full.jpg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (jpg)</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader_svg" onclick="saveAsSvg()" download="a635b569-bc36-424b-96e6-2d4d75ce0301.full.svg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (svg)</span>
+    </a>
+    <a class="cy-button" href="#" id="fullscreen" onclick="toggleFullScreen()">
+        <span id="fsspan" class="glyphicon glyphicon-fullscreen"></span><span id="fstext" class="buttontext">  Full screen</span>
+    </a>
+    
+<div class="slidecontainer">
+  <input type="range" min="0" max="7" value="7" class="slider" id="myRange" step="1">
+  <div class="slidertext">dist. to root: <span id="demo"></span></div>
+</div>
+</div></div>
+<!-- Load appplication code at the end to ensure DOM is loaded -->
+<script type="text/javascript">var layoutOptions = {
+  name: 'preset',
+  positions: function(node){
+    node.position('x', node.data('node_x'));
+    node.position('y', node.data('node_y'));
+    return node.position();
+  },
+  fit: true, // whether to fit to viewport
+  padding: 1, // padding on fit
+};
+
+
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+
+  style: cytoscape.stylesheet()
+    .selector('node')
+      .css({
+        'width': 300,
+        'height': 300,
+        'content': '',
+        'shape': 'barrel',
+        'pie-size': '100%',
+        'background-color': '#909090',
+        'color': '#383838',
+        'text-opacity': 1,
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-size': 80,
+        'text-halign' : 'center',
+        'text-valign' : 'center',
+        'min-zoomed-font-size': 12,
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': .3,
+        'text-background-padding' : 1,
+      })
+    .selector('node[node_name]')
+      .css({
+        'content': 'data(node_name)',
+      })
+    .selector('node[tip]')
+      .css({
+        'width': 500,
+        'height': 500,
+        'font-size': 100,
+        'shape': 'ellipse',
+      })
+    .selector('node[unresolved]')
+      .css({
+        'shape': 'octagon',
+        'pie-size': '90%',
+        'width': 600,
+        'height': 600,
+        'font-size': 150,
+      })
+    .selector('node[fake]')
+      .css({
+        'shape': 'rectangle',
+        'width': 1,
+        'height': 1,
+        'text-opacity': 0,
+        'font-size': 1,
+        'text-background-opacity': 0,
+        'text-background-padding' : 0,
+        'opacity': 0,
+      })
+    .selector('node[hidden>0]')
+      .css({
+        'opacity': 0.1,
+        'width': 100,
+        'height': 100,
+      })
+    
+    .selector(".Germany")
+        .css({
+        
+                'pie-1-background-color': "#a6cee3",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".UK")
+        .css({
+        
+                'pie-1-background-color': "#1f78b4",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".USA")
+        .css({
+        
+                'pie-1-background-color': "#b2df8a",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector('edge')
+      .css({
+        'width': 100,
+        'font-size': 100,
+        'color': 'black',
+        'content': '',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'target-arrow-color': '#909090',
+        'opacity': 1,
+        'text-opacity': 1,
+        'line-color': '#909090',
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': 1,
+        'text-background-padding' : 4,
+        'min-zoomed-font-size': 10,
+        'line-style': 'solid',
+        'line-dash-pattern': [200, 20],
+      })
+    .selector('edge[polytomy]')
+      .css({
+        'line-style': 'dashed',
+      })
+    .selector('edge[fake]')
+      .css({
+        'target-arrow-shape': 'none',
+      })
+    .selector('edge[edge_name]')
+      .css({
+        'content': 'data(edge_name)',
+      })
+    .selector('edge[edge_color]')
+      .css({
+        'target-arrow-color': 'data(edge_color)',
+        'line-color': 'data(edge_color)',
+        'width': 80,
+      })
+    .selector(':selected')
+      .css({
+        'background-color': 'black',
+        'line-color': 'black',
+        'target-arrow-color': 'black',
+        'source-arrow-color': 'black',
+        'pie-size': '60%',
+        'opacity': 1
+      })
+    .selector('.faded')
+      .css({
+        'opacity': 0.25,
+        'text-opacity': 0
+      }),
+
+  elements: {'nodes': [{'data': {'id': 'fake_node_0', 'fake': 1, 'node_x': 3028.125, 'node_y': 0.0}}, {'data': {'mile': 0, 'node_root_id': 'Node_17', 'node_root_date': 0, 'node_name': 'Node_17', 'id': 0, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3028.125, 'node_y': 0.0}, 'classes': 'USA'}, {'data': {'id': 'fake_node_1', 'fake': 1, 'node_x': 300.0, 'node_y': 0.0}}, {'data': {'id': 'fake_node_2', 'fake': 1, 'node_x': 5756.25, 'node_y': 0.0}}, {'data': {'mile': 4, 'node_root_id': 'Node_1', 'node_root_date': 29.446554, 'node_name': 'Node_1', 'id': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 300.0, 'node_y': 2001.329084341998}, 'classes': 'USA'}, {'data': {'id': 'fake_node_3', 'fake': 1, 'node_x': 0, 'node_y': 2001.329084341998}}, {'data': {'id': 'fake_node_4', 'fake': 1, 'node_x': 600, 'node_y': 2001.329084341998}}, {'data': {'mile': 0, 'node_root_id': 'Node_16', 'node_root_date': 15.897673, 'node_name': 'Node_16', 'id': 2, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 5756.25, 'node_y': 1080.4821286816277}, 'classes': 'USA'}, {'data': {'id': 'fake_node_5', 'fake': 1, 'node_x': 3693.75, 'node_y': 1080.4821286816277}}, {'data': {'id': 'fake_node_6', 'fake': 1, 'node_x': 7818.75, 'node_y': 1080.4821286816277}}, {'data': {'mile': 7, 'node_root_id': 'ERR7253785', 'node_root_date': 79.452894, 'node_name': 'ERR7253785', 'id': 3, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 0, 'node_y': 5399.999864070404}, 'classes': 'Germany'}, {'data': {'mile': 4, 'node_root_id': 'SRR12051736', 'node_root_date': 60.379379, 'node_name': 'SRR12051736', 'id': 4, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 600, 'node_y': 4103.672276464284}, 'classes': 'USA'}, {'data': {'mile': 0, 'node_root_id': 'Node_7', 'node_root_date': 51.926234, 'node_name': 'Node_7', 'id': 5, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3693.75, 'node_y': 3529.1559869636467}, 'classes': 'USA'}, {'data': {'id': 'fake_node_7', 'fake': 1, 'node_x': 2587.5, 'node_y': 3529.1559869636467}}, {'data': {'id': 'fake_node_8', 'fake': 1, 'node_x': 4800, 'node_y': 3529.1559869636467}}, {'data': {'mile': 4, 'node_root_id': 'Node_15', 'node_root_date': 71.318125, 'node_name': 'Node_15', 'id': 6, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 7818.75, 'node_y': 4847.1219349890025}, 'classes': 'UK'}, {'data': {'id': 'fake_node_9', 'fake': 1, 'node_x': 6337.5, 'node_y': 4847.1219349890025}}, {'data': {'id': 'fake_node_10', 'fake': 1, 'node_x': 9300.0, 'node_y': 4847.1219349890025}}, {'data': {'mile': 1, 'node_root_id': 'Node_6', 'node_root_date': 55.013344000000004, 'node_name': 'Node_6', 'id': 7, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2587.5, 'node_y': 3738.97079346233}, 'classes': 'USA'}, {'data': {'id': 'fake_node_11', 'fake': 1, 'node_x': 1500.0, 'node_y': 3738.97079346233}}, {'data': {'id': 'fake_node_12', 'fake': 1, 'node_x': 3675.0, 'node_y': 3738.97079346233}}, {'data': {'mile': 0, 'node_root_id': 'SRR350465', 'node_root_date': 51.926368000000004, 'node_name': 'SRR350465', 'id': 8, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 4800, 'node_y': 3529.165094246533}, 'classes': 'USA'}, {'data': {'mile': 5, 'node_root_id': 'Node_11', 'node_root_date': 73.344117, 'node_name': 'Node_11', 'id': 9, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6337.5, 'node_y': 4984.818071326185}, 'classes': 'UK'}, {'data': {'id': 'fake_node_13', 'fake': 1, 'node_x': 5400, 'node_y': 4984.818071326185}}, {'data': {'id': 'fake_node_14', 'fake': 1, 'node_x': 7275.0, 'node_y': 4984.818071326185}}, {'data': {'mile': 4, 'node_root_id': 'Node_14', 'node_root_date': 71.318259, 'node_name': 'Node_14', 'id': 10, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 9300.0, 'node_y': 4847.131042271889}, 'classes': 'UK'}, {'data': {'id': 'fake_node_15', 'fake': 1, 'node_x': 8700.0, 'node_y': 4847.131042271889}}, {'data': {'id': 'fake_node_16', 'fake': 1, 'node_x': 9900.0, 'node_y': 4847.131042271889}}, {'data': {'mile': 3, 'node_root_id': 'Node_2', 'node_root_date': 58.123475000000006, 'node_name': 'Node_2', 'id': 11, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 1500.0, 'node_y': 3950.3502175679037}, 'classes': 'USA'}, {'data': {'id': 'fake_node_17', 'fake': 1, 'node_x': 1200, 'node_y': 3950.3502175679037}}, {'data': {'id': 'fake_node_18', 'fake': 1, 'node_x': 1800, 'node_y': 3950.3502175679037}}, {'data': {'mile': 1, 'node_root_id': 'Node_5', 'node_root_date': 56.039621000000004, 'node_name': 'Node_5', 'id': 12, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3675.0, 'node_y': 3808.7215021086204}, 'classes': 'USA'}, {'data': {'id': 'fake_node_19', 'fake': 1, 'node_x': 3150.0, 'node_y': 3808.7215021086204}}, {'data': {'id': 'fake_node_20', 'fake': 1, 'node_x': 4200, 'node_y': 3808.7215021086204}}, {'data': {'mile': 5, 'node_root_id': 'SRR6388774', 'node_root_date': 73.344251, 'node_name': 'SRR6388774', 'id': 13, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 5400, 'node_y': 4984.827178609072}, 'classes': 'UK'}, {'data': {'mile': 5, 'node_root_id': 'Node_10', 'node_root_date': 76.412864, 'node_name': 'Node_10', 'id': 14, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 7275.0, 'node_y': 5193.3848402454705}, 'classes': 'UK'}, {'data': {'id': 'fake_node_21', 'fake': 1, 'node_x': 6750.0, 'node_y': 5193.3848402454705}}, {'data': {'id': 'fake_node_22', 'fake': 1, 'node_x': 7800, 'node_y': 5193.3848402454705}}, {'data': {'mile': 4, 'node_root_id': 'Node_12', 'node_root_date': 71.318393, 'node_name': 'Node_12', 'id': 15, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 8700.0, 'node_y': 4847.140149554775}, 'classes': 'UK'}, {'data': {'id': 'fake_node_23', 'fake': 1, 'node_x': 8400, 'node_y': 4847.140149554775}}, {'data': {'id': 'fake_node_24', 'fake': 1, 'node_x': 9000, 'node_y': 4847.140149554775}}, {'data': {'mile': 4, 'node_root_id': 'Node_13', 'node_root_date': 71.318393, 'node_name': 'Node_13', 'id': 16, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 9900.0, 'node_y': 4847.140149554775}, 'classes': 'UK'}, {'data': {'id': 'fake_node_25', 'fake': 1, 'node_x': 9600, 'node_y': 4847.140149554775}}, {'data': {'id': 'fake_node_26', 'fake': 1, 'node_x': 10200, 'node_y': 4847.140149554775}}, {'data': {'mile': 3, 'node_root_id': 'SRR315392', 'node_root_date': 59.133992000000006, 'node_name': 'SRR315392', 'id': 17, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 1200, 'node_y': 4019.0298010031}, 'classes': 'USA'}, {'data': {'mile': 3, 'node_root_id': 'SRR315387', 'node_root_date': 58.12360900000001, 'node_name': 'SRR315387', 'id': 18, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 1800, 'node_y': 3950.35932485079}, 'classes': 'USA'}, {'data': {'mile': 1, 'node_root_id': 'Node_4', 'node_root_date': 56.03975500000001, 'node_name': 'Node_4', 'id': 19, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3150.0, 'node_y': 3808.7306093915067}, 'classes': 'USA'}, {'data': {'id': 'fake_node_27', 'fake': 1, 'node_x': 2700.0, 'node_y': 3808.7306093915067}}, {'data': {'id': 'fake_node_28', 'fake': 1, 'node_x': 3600, 'node_y': 3808.7306093915067}}, {'data': {'mile': 1, 'node_root_id': 'SRR315378', 'node_root_date': 56.03975500000001, 'node_name': 'SRR315378', 'id': 20, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 4200, 'node_y': 3808.7306093915067}, 'classes': 'USA'}, {'data': {'mile': 5, 'node_root_id': 'Node_9', 'node_root_date': 76.412998, 'node_name': 'Node_9', 'id': 21, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6750.0, 'node_y': 5193.393947528357}, 'classes': 'UK'}, {'data': {'id': 'fake_node_29', 'fake': 1, 'node_x': 6300.0, 'node_y': 5193.393947528357}}, {'data': {'id': 'fake_node_30', 'fake': 1, 'node_x': 7200, 'node_y': 5193.393947528357}}, {'data': {'mile': 7, 'node_root_id': 'ERR5413850', 'node_root_date': 79.452896, 'node_name': 'ERR5413850', 'id': 22, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 7800, 'node_y': 5399.999999999999}, 'classes': 'UK'}, {'data': {'mile': 4, 'node_root_id': 'ERR337770', 'node_root_date': 71.318527, 'node_name': 'ERR337770', 'id': 23, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 8400, 'node_y': 4847.149256837662}, 'classes': 'UK'}, {'data': {'mile': 4, 'node_root_id': 'ERR363360', 'node_root_date': 71.318527, 'node_name': 'ERR363360', 'id': 24, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 9000, 'node_y': 4847.149256837662}, 'classes': 'UK'}, {'data': {'mile': 4, 'node_root_id': 'ERR337769', 'node_root_date': 71.318527, 'node_name': 'ERR337769', 'id': 25, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 9600, 'node_y': 4847.149256837662}, 'classes': 'UK'}, {'data': {'mile': 4, 'node_root_id': 'ERR363359', 'node_root_date': 71.318527, 'node_name': 'ERR363359', 'id': 26, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 10200, 'node_y': 4847.149256837662}, 'classes': 'UK'}, {'data': {'mile': 2, 'node_root_id': 'Node_3', 'node_root_date': 56.03988900000001, 'node_name': 'Node_3', 'id': 27, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2700.0, 'node_y': 3808.739716674393}, 'classes': 'USA'}, {'data': {'id': 'fake_node_31', 'fake': 1, 'node_x': 2400, 'node_y': 3808.739716674393}}, {'data': {'id': 'fake_node_32', 'fake': 1, 'node_x': 3000, 'node_y': 3808.739716674393}}, {'data': {'mile': 1, 'node_root_id': 'SRR901247', 'node_root_date': 56.03988900000001, 'node_name': 'SRR901247', 'id': 28, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3600, 'node_y': 3808.739716674393}, 'classes': 'USA'}, {'data': {'mile': 6, 'node_root_id': 'Node_8', 'node_root_date': 76.413132, 'node_name': 'Node_8', 'id': 29, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6300.0, 'node_y': 5193.403054811243}, 'classes': 'UK'}, {'data': {'id': 'fake_node_33', 'fake': 1, 'node_x': 6000, 'node_y': 5193.403054811243}}, {'data': {'id': 'fake_node_34', 'fake': 1, 'node_x': 6600, 'node_y': 5193.403054811243}}, {'data': {'mile': 5, 'node_root_id': 'ERR5412063', 'node_root_date': 76.413132, 'node_name': 'ERR5412063', 'id': 30, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 7200, 'node_y': 5193.403054811243}, 'classes': 'UK'}, {'data': {'mile': 2, 'node_root_id': 'SRR315379', 'node_root_date': 56.04002300000001, 'node_name': 'SRR315379', 'id': 31, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2400, 'node_y': 3808.7488239572795}, 'classes': 'USA'}, {'data': {'mile': 2, 'node_root_id': 'SRR315384', 'node_root_date': 56.04002300000001, 'node_name': 'SRR315384', 'id': 32, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3000, 'node_y': 3808.7488239572795}, 'classes': 'USA'}, {'data': {'mile': 6, 'node_root_id': 'ERR5413703', 'node_root_date': 76.41326600000001, 'node_name': 'ERR5413703', 'id': 33, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6000, 'node_y': 5193.41216209413}, 'classes': 'UK'}, {'data': {'mile': 6, 'node_root_id': 'ERR5412001', 'node_root_date': 76.41326600000001, 'node_name': 'ERR5412001', 'id': 34, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6600, 'node_y': 5193.41216209413}, 'classes': 'UK'}], 'edges': [{'data': {'source': 'fake_node_0', 'target': 0, 'edge_name': 0.0, 'mile': 0}}, {'data': {'source': 0, 'target': 'fake_node_1', 'fake': 1, 'mile': 4, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_1', 'target': 1, 'edge_name': 29.446554, 'mile': 4, 'edge_color': '#b2df8a'}}, {'data': {'source': 0, 'target': 'fake_node_2', 'fake': 1, 'mile': 0, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_2', 'target': 2, 'edge_name': 15.897673, 'mile': 0, 'edge_color': '#b2df8a'}}, {'data': {'source': 1, 'target': 'fake_node_3', 'fake': 1, 'mile': 7}}, {'data': {'source': 'fake_node_3', 'target': 3, 'edge_name': 50.00634, 'mile': 7}}, {'data': {'source': 1, 'target': 'fake_node_4', 'fake': 1, 'mile': 4, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_4', 'target': 4, 'edge_name': 30.932825, 'mile': 4, 'edge_color': '#b2df8a'}}, {'data': {'source': 2, 'target': 'fake_node_5', 'fake': 1, 'mile': 0, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_5', 'target': 5, 'edge_name': 36.028561, 'mile': 0, 'edge_color': '#b2df8a'}}, {'data': {'source': 2, 'target': 'fake_node_6', 'fake': 1, 'mile': 4}}, {'data': {'source': 'fake_node_6', 'target': 6, 'edge_name': 55.420452, 'mile': 4}}, {'data': {'source': 5, 'target': 'fake_node_7', 'fake': 1, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_7', 'target': 7, 'edge_name': 3.08711, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 5, 'target': 'fake_node_8', 'fake': 1, 'mile': 0, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_8', 'target': 8, 'edge_name': 0.000134, 'mile': 0, 'edge_color': '#b2df8a'}}, {'data': {'source': 6, 'target': 'fake_node_9', 'fake': 1, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_9', 'target': 9, 'edge_name': 2.025992, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 6, 'target': 'fake_node_10', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_10', 'target': 10, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 7, 'target': 'fake_node_11', 'fake': 1, 'mile': 3, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_11', 'target': 11, 'edge_name': 3.110131, 'mile': 3, 'edge_color': '#b2df8a'}}, {'data': {'source': 7, 'target': 'fake_node_12', 'fake': 1, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_12', 'target': 12, 'edge_name': 1.026277, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 9, 'target': 'fake_node_13', 'fake': 1, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_13', 'target': 13, 'edge_name': 0.000134, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 9, 'target': 'fake_node_14', 'fake': 1, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_14', 'target': 14, 'edge_name': 3.068747, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 10, 'target': 'fake_node_15', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_15', 'target': 15, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 10, 'target': 'fake_node_16', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_16', 'target': 16, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 11, 'target': 'fake_node_17', 'fake': 1, 'mile': 3, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_17', 'target': 17, 'edge_name': 1.010517, 'mile': 3, 'edge_color': '#b2df8a'}}, {'data': {'source': 11, 'target': 'fake_node_18', 'fake': 1, 'mile': 3, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_18', 'target': 18, 'edge_name': 0.000134, 'mile': 3, 'edge_color': '#b2df8a'}}, {'data': {'source': 12, 'target': 'fake_node_19', 'fake': 1, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_19', 'target': 19, 'edge_name': 0.000134, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 12, 'target': 'fake_node_20', 'fake': 1, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_20', 'target': 20, 'edge_name': 0.000134, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 14, 'target': 'fake_node_21', 'fake': 1, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_21', 'target': 21, 'edge_name': 0.000134, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 14, 'target': 'fake_node_22', 'fake': 1, 'mile': 7, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_22', 'target': 22, 'edge_name': 3.040032, 'mile': 7, 'edge_color': '#1f78b4'}}, {'data': {'source': 15, 'target': 'fake_node_23', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_23', 'target': 23, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 15, 'target': 'fake_node_24', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_24', 'target': 24, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 16, 'target': 'fake_node_25', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_25', 'target': 25, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 16, 'target': 'fake_node_26', 'fake': 1, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_26', 'target': 26, 'edge_name': 0.000134, 'mile': 4, 'edge_color': '#1f78b4'}}, {'data': {'source': 19, 'target': 'fake_node_27', 'fake': 1, 'mile': 2, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_27', 'target': 27, 'edge_name': 0.000134, 'mile': 2, 'edge_color': '#b2df8a'}}, {'data': {'source': 19, 'target': 'fake_node_28', 'fake': 1, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_28', 'target': 28, 'edge_name': 0.000134, 'mile': 1, 'edge_color': '#b2df8a'}}, {'data': {'source': 21, 'target': 'fake_node_29', 'fake': 1, 'mile': 6, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_29', 'target': 29, 'edge_name': 0.000134, 'mile': 6, 'edge_color': '#1f78b4'}}, {'data': {'source': 21, 'target': 'fake_node_30', 'fake': 1, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_30', 'target': 30, 'edge_name': 0.000134, 'mile': 5, 'edge_color': '#1f78b4'}}, {'data': {'source': 27, 'target': 'fake_node_31', 'fake': 1, 'mile': 2, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_31', 'target': 31, 'edge_name': 0.000134, 'mile': 2, 'edge_color': '#b2df8a'}}, {'data': {'source': 27, 'target': 'fake_node_32', 'fake': 1, 'mile': 2, 'edge_color': '#b2df8a'}}, {'data': {'source': 'fake_node_32', 'target': 32, 'edge_name': 0.000134, 'mile': 2, 'edge_color': '#b2df8a'}}, {'data': {'source': 29, 'target': 'fake_node_33', 'fake': 1, 'mile': 6, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_33', 'target': 33, 'edge_name': 0.000134, 'mile': 6, 'edge_color': '#1f78b4'}}, {'data': {'source': 29, 'target': 'fake_node_34', 'fake': 1, 'mile': 6, 'edge_color': '#1f78b4'}}, {'data': {'source': 'fake_node_34', 'target': 34, 'edge_name': 0.000134, 'mile': 6, 'edge_color': '#1f78b4'}}]},
+
+  layout: layoutOptions,
+
+  ready: function(){
+    window.cy = this;
+  }
+});
+
+function addQtips() {
+    cy.filter(function(ele, i, eles) {
+        return ele.isNode() && ele.data('tooltip') !== undefined;
+    } ).qtip({
+        content: function(){
+                return '<br><div style="overflow: auto;"><span style="white-space:nowrap;">'
+                + this.data('tooltip') + '</span></div>' + '<br>id: ' + this.data('node_root_id')
+                + '<br>dist. to root: ' + this.data('node_root_date');
+            },
+        show: {event: 'mouseover'},
+        hide: {event: 'mouseout'},
+        style: {
+                classes: 'qtip-bootstrap',
+        },
+        position: {
+            at: 'center center',
+        }
+    });
+}
+
+cy.minZoom(.001);
+cy.maxZoom(20);
+addQtips();
+
+
+function toImage(){
+    document.getElementById("downloader").href = cy.jpg({ full: false, quality: 1.0, scale: 2}).replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}
+
+function saveAsSvg() {
+    var svgContent = cy.svg({scale: 1, full: true});
+    var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+    document.getElementById("downloader_svg").href = URL.createObjectURL(blob);
+}
+
+function fit() {
+    cy.fit();
+}
+
+function resetLayout() {
+    cy.startBatch();
+    cy.layout(layoutOptions).run();
+
+    if (slider !== null) {
+        var cur_dist_attr = 'edge_name_' + slider.value;
+        var initial_dist_attr = 'edge_name_' + slider.max;
+        var cur_dist, initial_dist, mile;
+
+        if (removed !== undefined) {
+            removed.forEach(function( ele ) {
+                if (ele.isEdge()) {
+                    ele.target().position('x', ele.target().data('node_x'));
+                    ele.target().position('y', ele.target().data('node_y'));
+
+                    // the targets of hidden nodes might need to be moved to the last visible position for LTT timeline
+                    if (ele.data(initial_dist_attr) !== undefined) {
+                        mile = ele.target().data('mile');
+                        if (mile !== undefined) {
+                            initial_dist = ele.data(initial_dist_attr);
+                            cur_dist = ele.data('edge_name_' + mile);
+                            ele.target().position('y', (ele.source().position('y') +
+                            cur_dist * (ele.target().position('y') - ele.source().position('y')) / initial_dist));
+                        }
+                    }
+                }
+            });
+        }
+
+        cy.edges().forEach(function( ele ) {
+            cur_dist = ele.data(cur_dist_attr);
+            initial_dist = ele.data(initial_dist_attr);
+            if (cur_dist !== undefined && cur_dist != initial_dist) {
+                ele.target().position('y', (ele.source().position('y') +
+                cur_dist * (ele.target().position('y') - ele.source().position('y')) / initial_dist));
+            }
+        });
+    }
+    cy.endBatch();
+}
+
+var years = ['51.9264', '56.0399', '56.04', '59.134', '71.3185', '76.4131', '76.4133', '79.4529'];
+var slider = document.getElementById("myRange");
+if (slider !== null) {
+    var output = document.getElementById("demo");
+    output.innerHTML = years[slider.value]; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    var removed = cy.collection();
+
+    slider.oninput = function() {
+        output.innerHTML = years[this.value];
+
+        cy.startBatch();
+
+        removed.restore();
+        removed = cy.remove("[mile>" + this.value + "]");
+
+        var cur_dist_attr = 'edge_name_' + this.value;
+        var initial_dist_attr = 'edge_name_' + this.max;
+        var old_dist, cur_dist;
+
+        cy.edges().forEach(function( ele ){
+            old_dist = ele.data('edge_name');
+            cur_dist = ele.data(cur_dist_attr);
+            if (cur_dist !== undefined && cur_dist != old_dist) {
+                if (ele.data(initial_dist_attr) != cur_dist) {
+                    ele.target().data('hidden', 1);
+                } else {
+                    ele.target().data('hidden', 0);
+                    console.log(ele.target().data());
+                }
+                ele.target().position('y', (ele.source().position('y')
+                + cur_dist * (ele.target().position('y') - ele.source().position('y')) / old_dist));
+                ele.data('edge_name', cur_dist);
+            }
+        });
+        cy.endBatch();
+    }
+}
+
+function toggleFullScreen() {
+  var elem = document.getElementById("fullscreenDiv");
+  if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+   (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (elem.requestFullScreen) {
+      elem.requestFullScreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullScreen) {
+      elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-resize-small"
+    document.getElementById("fstext").innerHTML = "  Exit full screen"
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-fullscreen"
+    document.getElementById("fstext").innerHTML = "  Full screen"
+  }
+}</script>
+</body>
+</html>

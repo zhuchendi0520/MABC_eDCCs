@@ -1,0 +1,8 @@
+#NEXUS
+Begin Taxa;
+ Dimensions NTax=11;
+ TaxLabels ERR11194171 Japan43 DRR317405 Japan176 DRR245231 SRR25361534 SRR13786036 SRR13786025 SRR29408734 ERR8266590 ERR1413200;
+End;
+Begin Trees;
+ Tree tree1=(((ERR11194171:27.38760[&date=27.388512000000002,geo_loc_name_country=Spain],(Japan43:5.37889[&date=16.130043,geo_loc_name_country=Japan],(DRR317405:4.22495[&date=17.057811,geo_loc_name_country=Japan],(Japan176:5.29862[&date=18.13195,geo_loc_name_country=Japan],DRR245231:4.21936[&date=17.052694,geo_loc_name_country=Japan])n2:0.00047[&date=12.833331,geo_loc_name_country=Japan])n11:2.08170[&date=12.832856999999999,geo_loc_name_country=Japan])n1:10.75020[&date=10.751157999999998,geo_loc_name_country=Japan])n00:0.00047[&date=0.000948,geo_loc_name_country=Japan],(SRR25361534:10.64560[&date=10.646562,geo_loc_name_country=Australia],(SRR13786036:0.00047[&date=19.576308,geo_loc_name_country=USA],SRR13786025:0.00047[&date=19.576308,geo_loc_name_country=USA])n3:19.57490[&date=19.575834,geo_loc_name_country=USA])n22:0.00047[&date=0.000948,geo_loc_name_country=Japan])n0:0.00047[&date=0.000474,geo_loc_name_country=Japan],(SRR29408734:7.54485[&date=10.703538,geo_loc_name_country=China],(ERR8266590:0.00047[&date=12.789648,geo_loc_name_country=Germany],ERR1413200:0.00047[&date=12.789648,geo_loc_name_country=Germany])n4:9.63048[&date=12.789174,geo_loc_name_country=Germany])n33:3.15869[&date=3.158691,geo_loc_name_country=China])root:0.00000[&date=0,geo_loc_name_country=Japan];
+End;

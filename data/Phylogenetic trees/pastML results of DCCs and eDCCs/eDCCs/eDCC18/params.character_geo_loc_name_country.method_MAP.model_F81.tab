@@ -1,0 +1,14 @@
+parameter	value
+pastml_version	1.9.34
+character	geo_loc_name_country
+log_likelihood	-3.8517074538758465
+log_likelihood_restricted_MAP	-3.8691865587316583
+method	MAP
+model	F81
+num_nodes	99
+num_tips	50
+scaling_factor	0.022939238565939327
+smoothing_factor	0
+state_changes_per_avg_branch	0.021655305976017412
+Ireland	0.10388015739768461
+UK	0.8961198426023155

@@ -1,0 +1,15 @@
+parameter	value
+pastml_version	1.9.34
+character	geo_loc_name_country
+log_likelihood	-5.151717549724527
+log_likelihood_restricted_MAP	-6.447268910144438
+method	MAP
+model	F81
+num_nodes	11
+num_tips	6
+scaling_factor	0.015051868745407647
+smoothing_factor	0
+state_changes_per_avg_branch	0.3947934017120922
+Germany	0.2532685430448527
+Japan	0.41917299657902324
+Taiwan	0.32755846037612407

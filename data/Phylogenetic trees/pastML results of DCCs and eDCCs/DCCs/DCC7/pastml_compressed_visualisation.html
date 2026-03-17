@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: helvetica,serif;
+  font-size: 14px;
+}
+
+#cy {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+}
+
+h1 {
+  opacity: 0.5;
+  font-size: 1em;
+}
+
+.floating {
+    max-width: 30%;
+    width: 120px;
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.cy-button {
+    background-color: #555555;
+    border: none;
+    color: white;
+    padding: 6px 0px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+a.cy-button:link, a.cy-button:visited, a.cy-button:hover {
+    color: white;
+    text-decoration: none;
+}
+
+
+.slidertext {
+    width: 100%;
+    color: #555555;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    text-align: center;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    margin: 10px 0px;
+    display: inline-block;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #555555;
+    cursor: pointer;
+}
+
+@media all and (max-width: 600px) {
+    .buttontext {
+        display: none;
+    }
+}
+
+
+</style>
+<meta charset=utf-8 />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+<title>d687f915-9f15-417c-8620-ee355a20e9e7.compressed</title>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/jquery.qtip.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-qtip.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-svg.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/layout-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cose-base.min.js"></script>
+    
+    <script  type='text/javascript' src="https://pastml.pasteur.fr/static/js/cytoscape-cose-bilkent.min.js"></script>
+    
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/jquery.qtip.min.css"/>
+    
+    <link rel="stylesheet" type="text/css" href="https://pastml.pasteur.fr/static/css/bootstrap.min.css"/>
+    
+<meta http-Equiv="Cache-Control" Content="no-cache" />
+<meta http-Equiv="Pragma" Content="no-cache" />
+<meta http-Equiv="Expires" Content="0" />
+</head>
+<body>
+<div id="fullscreenDiv">
+<div id="cy"></div>
+<div class="floating">
+    <a class="cy-button" href="#" id="fit" onclick="fit()">
+        <span class="glyphicon glyphicon-resize-full"></span><span class="buttontext">  Fit screen</span>
+    </a>
+    <a class="cy-button" href="#" id="reset" onclick="resetLayout()">
+        <span class="glyphicon glyphicon-picture"></span><span class="buttontext">  Restore layout</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader" onclick="toImage()" download="d687f915-9f15-417c-8620-ee355a20e9e7.compressed.jpg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (jpg)</span>
+    </a>
+    <a class="cy-button" href="#" id="downloader_svg" onclick="saveAsSvg()" download="d687f915-9f15-417c-8620-ee355a20e9e7.compressed.svg">
+        <span class="glyphicon glyphicon-save"></span><span class="buttontext">  Save (svg)</span>
+    </a>
+    <a class="cy-button" href="#" id="fullscreen" onclick="toggleFullScreen()">
+        <span id="fsspan" class="glyphicon glyphicon-fullscreen"></span><span id="fstext" class="buttontext">  Full screen</span>
+    </a>
+    
+<div class="slidecontainer">
+  <input type="range" min="0" max="8" value="8" class="slider" id="myRange" step="1">
+  <div class="slidertext">dist. to root: <span id="demo"></span></div>
+</div>
+</div></div>
+<!-- Load appplication code at the end to ensure DOM is loaded -->
+<script type="text/javascript">var layoutOptions = {
+  name: 'preset',
+  positions: function(node){
+    node.position('x', node.data('node_x'));
+    node.position('y', node.data('node_y'));
+    return node.position();
+  },
+  fit: true, // whether to fit to viewport
+  padding: 1, // padding on fit
+};
+
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+
+  style: cytoscape.stylesheet()
+    .selector('node')
+      .css({
+        'width': 300,
+        'height': 300,
+        'content': '',
+        'shape': 'ellipse',
+        'pie-size': '100%',
+        'background-color': '#909090',
+        'color': '#383838',
+        'text-opacity': 1,
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-size': 80,
+        'text-halign' : 'center',
+        'text-valign' : 'center',
+        'min-zoomed-font-size': 12,
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': .3,
+        'text-background-padding' : 1,
+      })
+    .selector('node[node_name]')
+      .css({
+        'content': 'data(node_name)',
+      })
+    .selector('node[tip]')
+      .css({
+        'width': 400,
+        'height': 400,
+        'font-size': 100,
+      })
+    .selector('node[unresolved]')
+      .css({
+        'shape': 'octagon',
+        'pie-size': '92%',
+        'width': 500,
+        'height': 500,
+        'font-size': 125,
+      })
+    .selector('node[node_size]')
+      .css({
+        'width': 'data(node_size)',
+        'height': 'data(node_size)',
+      })
+    .selector('node[node_fontsize]')
+      .css({
+        'font-size': 'data(node_fontsize)',
+      })
+    
+    .selector(".France")
+        .css({
+        
+                'pie-1-background-color': "#e41a1c",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Germany")
+        .css({
+        
+                'pie-1-background-color': "#377eb8",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".Ireland")
+        .css({
+        
+                'pie-1-background-color': "#4daf4a",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".UK")
+        .css({
+        
+                'pie-1-background-color': "#984ea3",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector(".USA")
+        .css({
+        
+                'pie-1-background-color': "#ff7f00",
+                'pie-1-background-size': '100.0\%',
+            
+        })
+    
+    .selector('edge')
+      .css({
+        'width': 50,
+        'font-size': 80,
+        'color': 'black',
+        'content': '',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'target-arrow-color': '#909090',
+        'opacity': 0.8,
+        'text-opacity': 1,
+        'line-color': '#909090',
+        'line-style': 'solid',
+        'text-background-color' : '#ffffff',
+        'text-background-shape' : 'roundrectangle',
+        'text-background-opacity': 1,
+        'text-background-padding' : 4,
+        'min-zoomed-font-size': 10,
+        'line-dash-pattern': [100, 10],
+      })
+    .selector('edge[polytomy]')
+      .css({
+        'line-style': 'dashed',
+      })
+    .selector('edge[edge_name>1]')
+      .css({
+        'line-color': '#383838',
+        'target-arrow-color': '#383838',
+        'content': 'data(edge_name)',
+      })
+    .selector('edge[edge_size]')
+      .css({
+        'width': 'data(edge_size)',
+        'font-size': 'data(edge_size)',
+      })
+    .selector(':selected')
+      .css({
+        'background-color': 'black',
+        'line-color': 'black',
+        'target-arrow-color': 'black',
+        'source-arrow-color': 'black',
+        'pie-size': '60%',
+        'opacity': 1
+      })
+    .selector('.faded')
+      .css({
+        'opacity': 0.25,
+        'text-opacity': 0
+      }),
+
+  elements: {'nodes': [{'data': {'node_in_tips_6': ' 70', 'node_fontsize': 240, 'node_name_2': 'USA 26', 'node_root_dates_0': '0', 'node_fontsize_8': 240, 'node_in_tips_7': ' 76', 'node_name_1': 'USA 10', 'node_name_5': 'USA 59', 'node_size_1': 578, 'node_in_tips_3': ' 38', 'node_fontsize_3': 183, 'node_name_8': 'USA 81', 'mile': 0, 'node_root_dates_7': '0', 'node_in_ns_5': ' 86', 'node_name': 'USA 81', 'node_name_3': 'USA 38', 'node_all_tips_8': ' 139', 'node_root_dates_4': '0', 'node_in_ns_1': ' 29', 'node_in_tips_8': ' 81', 'node_root_dates_1': '0', 'node_in_ns_8': ' 103', 'node_all_tips_3': ' 53', 'node_roots_0': 'Node_144', 'node_root_dates_8': '0', 'node_size_7': 1550, 'node_all_tips_4': ' 70', 'node_roots_4': 'Node_144', 'node_size_2': 917, 'node_all_tips_7': ' 122', 'node_in_ns_4': ' 74', 'node_all_tips_5': ' 87', 'node_all_tips': ' 139', 'node_roots_6': 'Node_144', 'node_roots_5': 'Node_144', 'node_size_6': 1489, 'node_in_ns_7': ' 100', 'node_size_8': 1600, 'node_fontsize_5': 213, 'node_fontsize_4': 201, 'node_fontsize_1': 123, 'node_in_ns_0': ' 10', 'node_name_0': 'USA 0', 'node_root_dates_6': '0', 'node_size_0': 133, 'node_in_ns': ' 103', 'node_name_6': 'USA 70', 'node_in_tips_5': ' 59', 'node_root_dates': '0', 'node_size_3': 1103, 'node_size': 1600, 'node_roots_1': 'Node_144', 'node_size_5': 1369, 'node_in_tips_0': ' 0', 'node_root_dates_3': '0', 'node_roots': 'Node_144', 'node_root_dates_2': '0', 'node_all_tips_0': ' 1', 'node_fontsize_7': 234, 'node_in_tips_1': ' 10', 'node_name_4': 'USA 50', 'node_size_4': 1262, 'node_roots_8': 'Node_144', 'node_in_tips': ' 81', 'node_root_id': 'Node_144', 'node_all_tips_6': ' 105', 'node_name_7': 'USA 76', 'node_all_tips_2': ' 35', 'node_in_ns_3': ' 61', 'node_root_date': 0, 'node_in_ns_6': ' 93', 'node_root_dates_5': '0', 'node_fontsize_6': 227, 'node_roots_7': 'Node_144', 'node_in_ns_2': ' 47', 'node_in_tips_4': ' 50', 'node_fontsize_0': 80, 'node_roots_2': 'Node_144', 'node_fontsize_2': 161, 'node_roots_3': 'Node_144', 'node_in_tips_2': ' 26', 'node_all_tips_1': ' 18', 'id': 0, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 4305.045454545455, 'node_y': 0}, 'classes': 'USA'}, {'data': {'node_in_tips_6': ' 2', 'node_fontsize': 88, 'node_fontsize_8': 88, 'node_meta_7': 1, 'node_in_tips_7': ' 2', 'node_name_5': 'Germany 2', 'node_in_tips_3': ' 2', 'node_fontsize_3': 88, 'node_name_8': 'Germany 2', 'mile': 3, 'node_root_dates_7': '45.051595, 56.14145499999999, 30.751523, 43.03626', 'node_in_ns_5': ' 1', 'node_name': 'Germany 2', 'node_name_3': 'Germany 2', 'node_all_tips_8': ' 2', 'node_meta_8': 1, 'node_root_dates_4': '30.751523', 'node_in_tips_8': ' 2', 'node_in_ns_8': ' 1', 'node_all_tips_3': ' 2', 'node_root_dates_8': '45.051595, 56.14145499999999, 30.751523, 43.03626', 'node_roots_4': 'Node_54', 'node_size_7': 272, 'node_all_tips_4': ' 2', 'node_all_tips_7': ' 2', 'node_in_ns_4': ' 1', 'node_all_tips_5': ' 2', 'node_all_tips': ' 2', 'node_roots_6': 'Node_23, Node_54, Node_74', 'node_roots_5': 'Node_54', 'node_size_6': 272, 'node_in_ns_7': ' 1', 'node_size_8': 272, 'node_fontsize_5': 88, 'node_fontsize_4': 88, 'node_root_dates_6': '45.051595, 30.751523, 43.03626', 'node_in_ns': ' 1', 'node_name_6': 'Germany 2', 'node_in_tips_5': ' 2', 'node_root_dates': '45.051595, 56.14145499999999, 30.751523, 43.03626', 'node_size_3': 272, 'node_size': 272, 'node_size_5': 272, 'node_root_dates_3': '30.751523', 'node_roots': 'Node_23, Node_3, Node_54, Node_74', 'node_fontsize_7': 88, 'node_name_4': 'Germany 2', 'node_meta_6': 1, 'node_size_4': 272, 'node_roots_8': 'Node_23, Node_3, Node_54, Node_74', 'node_in_tips': ' 2', 'node_root_id': 'Node_23', 'node_all_tips_6': ' 2', 'node_name_7': 'Germany 2', 'node_in_ns_3': ' 1', 'node_root_date': 45.051595, 'node_in_ns_6': ' 1', 'node_root_dates_5': '30.751523', 'node_fontsize_6': 88, 'node_roots_7': 'Node_23, Node_3, Node_54, Node_74', 'node_in_tips_4': ' 2', 'node_roots_3': 'Node_54', 'node_meta': 1, 'id': 1, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 136.0, 'node_y': 1336.0}, 'classes': 'Germany'}, {'data': {'node_in_tips_6': ' 1', 'node_fontsize': 80, 'node_name_2': 'Germany 1', 'node_fontsize_8': 80, 'node_meta_7': 1, 'node_in_tips_7': ' 1', 'node_name_1': 'Germany 1', 'node_name_5': 'Germany 1', 'node_size_1': 200, 'node_in_tips_3': ' 1', 'node_fontsize_3': 80, 'node_name_8': 'Germany 1', 'mile': 1, 'node_root_dates_7': '33.97307, 19.416579999999996, 40.982023, 46.932797', 'node_in_ns_5': ' 0', 'node_name': 'Germany 1', 'node_name_3': 'Germany 1', 'node_all_tips_8': ' 1', 'node_meta_8': 1, 'node_root_dates_4': '33.97307, 19.416579999999996', 'node_in_ns_1': ' 0', 'node_in_tips_8': ' 1', 'node_root_dates_1': '19.416579999999996', 'node_in_ns_8': ' 0', 'node_all_tips_3': ' 1', 'node_root_dates_8': '33.97307, 19.416579999999996, 67.324913, 40.982023, 46.932797', 'node_roots_4': 'ERR1413182, ERR1413193', 'node_size_7': 200, 'node_all_tips_4': ' 1', 'node_size_2': 200, 'node_all_tips_7': ' 1', 'node_in_ns_4': ' 0', 'node_all_tips_5': ' 1', 'node_all_tips': ' 1', 'node_meta_5': 1, 'node_roots_6': 'ERR1413182, ERR1413193, ERR7253741', 'node_roots_5': 'ERR1413182, ERR1413193', 'node_size_6': 200, 'node_in_ns_7': ' 0', 'node_size_8': 200, 'node_fontsize_5': 80, 'node_fontsize_4': 80, 'node_fontsize_1': 80, 'node_root_dates_6': '33.97307, 19.416579999999996, 40.982023', 'node_in_ns': ' 0', 'node_name_6': 'Germany 1', 'node_in_tips_5': ' 1', 'node_root_dates': '33.97307, 19.416579999999996, 67.324913, 40.982023, 46.932797', 'node_size_3': 200, 'node_size': 200, 'node_roots_1': 'ERR1413193', 'node_size_5': 200, 'node_root_dates_3': '19.416579999999996', 'node_roots': 'ERR1413182, ERR1413193, ERR1869534, ERR7253741, ERR7253742', 'node_root_dates_2': '19.416579999999996', 'node_fontsize_7': 80, 'node_in_tips_1': ' 1', 'node_name_4': 'Germany 1', 'node_meta_6': 1, 'node_size_4': 200, 'node_roots_8': 'ERR1413182, ERR1413193, ERR1869534, ERR7253741, ERR7253742', 'node_in_tips': ' 1', 'node_root_id': 'ERR1413193', 'node_meta_4': 1, 'node_all_tips_6': ' 1', 'node_name_7': 'Germany 1', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0', 'node_root_date': 19.416579999999996, 'node_in_ns_6': ' 0', 'node_root_dates_5': '33.97307, 19.416579999999996', 'node_fontsize_6': 80, 'node_roots_7': 'ERR1413182, ERR1413193, ERR7253741, ERR7253742', 'node_in_ns_2': ' 0', 'node_in_tips_4': ' 1', 'node_roots_2': 'ERR1413193', 'node_fontsize_2': 80, 'node_roots_3': 'ERR1413193', 'node_in_tips_2': ' 1', 'node_all_tips_1': ' 1', 'node_meta': 1, 'id': 2, 'tip': 1, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 772.0, 'node_y': 1300.0}, 'classes': 'Germany'}, {'data': {'node_in_tips_8': ' 1', 'node_fontsize': 80, 'node_root_dates': '53.242587', 'node_in_ns_8': ' 1', 'node_fontsize_8': 80, 'node_root_dates_8': '53.242587', 'node_size': 200, 'node_name_7': 'Germany 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 53.242587, 'node_roots': 'Node_6', 'node_all_tips_7': ' 3', 'node_all_tips': ' 3', 'node_name_8': 'Germany 1', 'mile': 7, 'node_fontsize_7': 80, 'node_root_dates_7': '53.242587', 'node_in_ns_7': ' 1', 'node_size_8': 200, 'node_name': 'Germany 1', 'node_roots_7': 'Node_6', 'node_all_tips_8': ' 3', 'node_roots_8': 'Node_6', 'node_in_tips': ' 1', 'node_in_ns': ' 1', 'node_root_id': 'Node_6', 'id': 3, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 1372.0, 'node_y': 1300.0}, 'classes': 'Germany'}, {'data': {'node_in_tips_8': ' 1', 'node_in_tips_6': ' 1', 'node_fontsize': 80, 'node_in_tips_5': ' 1', 'node_root_dates': '33.834871', 'node_in_ns_8': ' 3', 'node_fontsize_8': 80, 'node_root_dates_8': '33.834871', 'node_root_dates_5': '33.834871', 'node_size': 200, 'node_name_7': 'Germany 1', 'node_size_7': 200, 'node_all_tips_4': ' 1', 'node_roots_4': 'Node_85', 'node_size_5': 200, 'node_in_tips_7': ' 1', 'node_root_date': 33.834871, 'node_name_5': 'Germany 1', 'node_in_ns_6': ' 3', 'node_roots': 'Node_85', 'node_all_tips_7': ' 5', 'node_in_ns_4': ' 2', 'node_all_tips_5': ' 4', 'node_all_tips': ' 5', 'node_name_8': 'Germany 1', 'node_roots_6': 'Node_85', 'mile': 4, 'node_fontsize_7': 80, 'node_root_dates_7': '33.834871', 'node_in_ns_7': ' 3', 'node_size_6': 200, 'node_fontsize_6': 80, 'node_size_8': 200, 'node_name': 'Germany 1', 'node_roots_7': 'Node_85', 'node_in_ns_5': ' 3', 'node_fontsize_5': 80, 'node_fontsize_4': 80, 'node_name_4': 'Germany 1', 'node_in_tips_4': ' 1', 'node_size_4': 200, 'node_roots_5': 'Node_85', 'node_all_tips_8': ' 5', 'node_roots_8': 'Node_85', 'node_in_tips': ' 1', 'node_root_dates_6': '33.834871', 'node_in_ns': ' 3', 'node_name_6': 'Germany 1', 'node_root_dates_4': '33.834871', 'node_root_id': 'Node_85', 'node_all_tips_6': ' 5', 'id': 4, 'tooltip': 'geo_loc_name_country: Germany', 'node_x': 2608.0, 'node_y': 1300.0}, 'classes': 'Germany'}, {'data': {'node_in_tips_6': ' 2', 'node_fontsize': 88, 'node_name_2': 'Ireland 2', 'node_root_dates_0': '19.398744', 'node_fontsize_8': 88, 'node_in_tips_7': ' 2', 'node_name_1': 'Ireland 2', 'node_name_5': 'Ireland 2', 'node_size_1': 272, 'node_in_tips_3': ' 2', 'node_fontsize_3': 88, 'node_name_8': 'Ireland 2', 'mile': 0, 'node_root_dates_7': '19.398744', 'node_in_ns_5': ' 1', 'node_name': 'Ireland 2', 'node_name_3': 'Ireland 2', 'node_all_tips_8': ' 2', 'node_root_dates_4': '19.398744', 'node_in_ns_1': ' 1', 'node_in_tips_8': ' 2', 'node_root_dates_1': '19.398744', 'node_in_ns_8': ' 1', 'node_all_tips_3': ' 2', 'node_roots_0': 'Node_130', 'node_root_dates_8': '19.398744', 'node_size_7': 272, 'node_all_tips_4': ' 2', 'node_roots_4': 'Node_130', 'node_size_2': 272, 'node_all_tips_7': ' 2', 'node_in_ns_4': ' 1', 'node_all_tips_5': ' 2', 'node_all_tips': ' 2', 'node_roots_6': 'Node_130', 'node_roots_5': 'Node_130', 'node_size_6': 272, 'node_in_ns_7': ' 1', 'node_size_8': 272, 'node_fontsize_5': 88, 'node_fontsize_4': 88, 'node_fontsize_1': 88, 'node_in_ns_0': ' 1', 'node_name_0': 'Ireland 1', 'node_root_dates_6': '19.398744', 'node_size_0': 200, 'node_in_ns': ' 1', 'node_name_6': 'Ireland 2', 'node_in_tips_5': ' 2', 'node_root_dates': '19.398744', 'node_size_3': 272, 'node_size': 272, 'node_roots_1': 'Node_130', 'node_size_5': 272, 'node_in_tips_0': ' 1', 'node_root_dates_3': '19.398744', 'node_roots': 'Node_130', 'node_root_dates_2': '19.398744', 'node_all_tips_0': ' 1', 'node_fontsize_7': 88, 'node_in_tips_1': ' 2', 'node_name_4': 'Ireland 2', 'node_size_4': 272, 'node_roots_8': 'Node_130', 'node_in_tips': ' 2', 'node_root_id': 'Node_130', 'node_all_tips_6': ' 2', 'node_name_7': 'Ireland 2', 'node_all_tips_2': ' 2', 'node_in_ns_3': ' 1', 'node_root_date': 19.398744, 'node_in_ns_6': ' 1', 'node_root_dates_5': '19.398744', 'node_fontsize_6': 88, 'node_roots_7': 'Node_130', 'node_in_ns_2': ' 1', 'node_in_tips_4': ' 2', 'node_fontsize_0': 80, 'node_roots_2': 'Node_130', 'node_fontsize_2': 88, 'node_roots_3': 'Node_130', 'node_in_tips_2': ' 2', 'node_all_tips_1': ' 2', 'id': 5, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 3880.0, 'node_y': 1336.0}, 'classes': 'Ireland'}, {'data': {'node_in_tips_6': ' 1', 'node_fontsize': 80, 'node_name_2': 'Ireland 1', 'node_fontsize_8': 80, 'node_in_tips_7': ' 1', 'node_name_1': 'Ireland 1', 'node_name_5': 'Ireland 1', 'node_size_1': 200, 'node_in_tips_3': ' 1', 'node_fontsize_3': 80, 'node_name_8': 'Ireland 1', 'mile': 1, 'node_root_dates_7': '25.578783', 'node_in_ns_5': ' 0', 'node_name': 'Ireland 1', 'node_name_3': 'Ireland 1', 'node_all_tips_8': ' 1', 'node_root_dates_4': '25.578783', 'node_in_ns_1': ' 0', 'node_in_tips_8': ' 1', 'node_root_dates_1': '25.578783', 'node_in_ns_8': ' 0', 'node_all_tips_3': ' 1', 'node_root_dates_8': '25.578783', 'node_size_7': 200, 'node_all_tips_4': ' 1', 'node_roots_4': 'ERR4020087', 'node_size_2': 200, 'node_all_tips_7': ' 1', 'node_in_ns_4': ' 0', 'node_all_tips_5': ' 1', 'node_all_tips': ' 1', 'node_roots_6': 'ERR4020087', 'node_roots_5': 'ERR4020087', 'node_size_6': 200, 'node_in_ns_7': ' 0', 'node_size_8': 200, 'node_fontsize_5': 80, 'node_fontsize_4': 80, 'node_fontsize_1': 80, 'node_root_dates_6': '25.578783', 'node_in_ns': ' 0', 'node_name_6': 'Ireland 1', 'node_in_tips_5': ' 1', 'node_root_dates': '25.578783', 'node_size_3': 200, 'node_size': 200, 'node_roots_1': 'ERR4020087', 'node_size_5': 200, 'node_root_dates_3': '25.578783', 'node_roots': 'ERR4020087', 'node_root_dates_2': '25.578783', 'node_fontsize_7': 80, 'node_in_tips_1': ' 1', 'node_name_4': 'Ireland 1', 'node_size_4': 200, 'node_roots_8': 'ERR4020087', 'node_in_tips': ' 1', 'node_root_id': 'ERR4020087', 'node_all_tips_6': ' 1', 'node_name_7': 'Ireland 1', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0', 'node_root_date': 25.578783, 'node_in_ns_6': ' 0', 'node_root_dates_5': '25.578783', 'node_fontsize_6': 80, 'node_roots_7': 'ERR4020087', 'node_in_ns_2': ' 0', 'node_in_tips_4': ' 1', 'node_roots_2': 'ERR4020087', 'node_fontsize_2': 80, 'node_roots_3': 'ERR4020087', 'node_in_tips_2': ' 1', 'node_all_tips_1': ' 1', 'id': 6, 'tip': 1, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 4516.0, 'node_y': 1300.0}, 'classes': 'Ireland'}, {'data': {'node_in_tips_8': ' 1', 'node_fontsize': 80, 'node_root_dates': '55.340503000000005', 'node_in_ns_8': ' 1', 'node_fontsize_8': 80, 'node_root_dates_8': '55.340503000000005', 'node_size': 200, 'node_name_7': 'Ireland 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 55.340503000000005, 'node_roots': 'Node_70', 'node_all_tips_7': ' 2', 'node_all_tips': ' 2', 'node_name_8': 'Ireland 1', 'mile': 7, 'node_fontsize_7': 80, 'node_root_dates_7': '55.340503000000005', 'node_in_ns_7': ' 1', 'node_size_8': 200, 'node_name': 'Ireland 1', 'node_roots_7': 'Node_70', 'node_all_tips_8': ' 2', 'node_roots_8': 'Node_70', 'node_in_tips': ' 1', 'node_in_ns': ' 1', 'node_root_id': 'Node_70', 'id': 7, 'tooltip': 'geo_loc_name_country: Ireland', 'node_x': 5116.0, 'node_y': 1300.0}, 'classes': 'Ireland'}, {'data': {'node_in_tips_8': ' 12', 'node_fontsize': 129, 'node_root_dates': '64.63792799999999', 'node_in_ns_8': ' 11', 'node_fontsize_8': 129, 'node_root_dates_8': '64.63792799999999', 'node_size': 631, 'node_name_7': 'UK 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 64.63792799999999, 'node_roots': 'Node_20', 'node_all_tips_7': ' 1', 'node_all_tips': ' 12', 'node_name_8': 'UK 12', 'mile': 7, 'node_fontsize_7': 80, 'node_root_dates_7': '64.63792799999999', 'node_in_ns_7': ' 1', 'node_size_8': 631, 'node_name': 'UK 12', 'node_roots_7': 'Node_20', 'node_all_tips_8': ' 12', 'node_roots_8': 'Node_20', 'node_in_tips': ' 12', 'node_in_ns': ' 11', 'node_root_id': 'Node_20', 'id': 8, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 5931.5, 'node_y': 1515.5}, 'classes': 'UK'}, {'data': {'node_in_tips_8': ' 9', 'node_in_tips_6': ' 9', 'node_fontsize': 120, 'node_in_tips_5': ' 9', 'node_root_dates': '29.692454999999995', 'node_in_ns_8': ' 8', 'node_fontsize_8': 120, 'node_root_dates_3': '29.692454999999995', 'node_size_3': 328, 'node_all_tips_3': ' 3', 'node_root_dates_8': '29.692454999999995', 'node_root_dates_5': '29.692454999999995', 'node_size': 550, 'node_name_7': 'UK 9', 'node_size_7': 550, 'node_all_tips_4': ' 6', 'node_roots_4': 'Node_40', 'node_size_5': 550, 'node_in_tips_7': ' 9', 'node_root_date': 29.692454999999995, 'node_in_ns_3': ' 3', 'node_name_5': 'UK 9', 'node_in_ns_6': ' 8', 'node_roots': 'Node_40', 'node_all_tips_7': ' 9', 'node_in_ns_4': ' 7', 'node_in_tips_3': ' 3', 'node_all_tips_5': ' 9', 'node_fontsize_3': 94, 'node_all_tips': ' 9', 'node_name_8': 'UK 9', 'node_roots_6': 'Node_40', 'mile': 3, 'node_fontsize_7': 120, 'node_root_dates_7': '29.692454999999995', 'node_in_ns_7': ' 8', 'node_size_6': 550, 'node_fontsize_6': 120, 'node_size_8': 550, 'node_name': 'UK 9', 'node_roots_7': 'Node_40', 'node_in_ns_5': ' 8', 'node_fontsize_5': 120, 'node_fontsize_4': 108, 'node_name_4': 'UK 6', 'node_in_tips_4': ' 6', 'node_name_3': 'UK 3', 'node_size_4': 453, 'node_roots_5': 'Node_40', 'node_all_tips_8': ' 9', 'node_roots_8': 'Node_40', 'node_in_tips': ' 9', 'node_roots_3': 'Node_40', 'node_root_dates_6': '29.692454999999995', 'node_in_ns': ' 8', 'node_name_6': 'UK 9', 'node_root_dates_4': '29.692454999999995', 'node_root_id': 'Node_40', 'node_all_tips_6': ' 9', 'id': 9, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 6922.0, 'node_y': 1475.0}, 'classes': 'UK'}, {'data': {'node_in_tips_6': ' 2', 'node_fontsize': 88, 'node_name_2': 'UK 2', 'node_fontsize_8': 88, 'node_meta_7': 1, 'node_in_tips_7': ' 2', 'node_name_1': 'UK 2', 'node_name_5': 'UK 2', 'node_size_1': 272, 'node_meta_3': 1, 'node_in_tips_3': ' 2', 'node_fontsize_3': 88, 'node_name_8': 'UK 2', 'mile': 1, 'node_root_dates_7': '55.378955999999995, 20.431149, 22.469203999999994, 38.94372', 'node_in_ns_5': ' 1', 'node_name': 'UK 2', 'node_name_3': 'UK 2', 'node_all_tips_8': ' 2', 'node_meta_8': 1, 'node_root_dates_4': '20.431149, 22.469203999999994', 'node_in_ns_1': ' 1', 'node_in_tips_8': ' 2', 'node_root_dates_1': '20.431149, 22.469203999999994', 'node_in_ns_8': ' 1', 'node_all_tips_3': ' 2', 'node_root_dates_8': '55.378955999999995, 20.431149, 22.469203999999994, 38.94372', 'node_roots_4': 'Node_134, Node_27', 'node_size_7': 272, 'node_all_tips_4': ' 2', 'node_size_2': 272, 'node_all_tips_7': ' 2', 'node_in_ns_4': ' 1', 'node_all_tips_5': ' 2', 'node_all_tips': ' 2', 'node_meta_5': 1, 'node_roots_6': 'Node_134, Node_27, Node_77', 'node_roots_5': 'Node_134, Node_27, Node_77', 'node_size_6': 272, 'node_in_ns_7': ' 1', 'node_meta_2': 1, 'node_size_8': 272, 'node_fontsize_5': 88, 'node_fontsize_4': 88, 'node_fontsize_1': 88, 'node_root_dates_6': '20.431149, 22.469203999999994, 38.94372', 'node_in_ns': ' 1', 'node_name_6': 'UK 2', 'node_meta_1': 1, 'node_in_tips_5': ' 2', 'node_root_dates': '55.378955999999995, 20.431149, 22.469203999999994, 38.94372', 'node_size_3': 272, 'node_size': 272, 'node_roots_1': 'Node_134, Node_27', 'node_size_5': 272, 'node_root_dates_3': '20.431149, 22.469203999999994', 'node_roots': 'Node_110, Node_134, Node_27, Node_77', 'node_root_dates_2': '20.431149, 22.469203999999994', 'node_fontsize_7': 88, 'node_in_tips_1': ' 2', 'node_name_4': 'UK 2', 'node_meta_6': 1, 'node_size_4': 272, 'node_roots_8': 'Node_110, Node_134, Node_27, Node_77', 'node_in_tips': ' 2', 'node_root_id': 'Node_27', 'node_meta_4': 1, 'node_all_tips_6': ' 2', 'node_name_7': 'UK 2', 'node_all_tips_2': ' 2', 'node_in_ns_3': ' 1', 'node_root_date': 22.469203999999994, 'node_in_ns_6': ' 1', 'node_root_dates_5': '20.431149, 22.469203999999994, 38.94372', 'node_fontsize_6': 88, 'node_roots_7': 'Node_110, Node_134, Node_27, Node_77', 'node_in_ns_2': ' 1', 'node_in_tips_4': ' 2', 'node_roots_2': 'Node_134, Node_27', 'node_fontsize_2': 88, 'node_roots_3': 'Node_134, Node_27', 'node_in_tips_2': ' 2', 'node_all_tips_1': ' 2', 'node_meta': 1, 'id': 10, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 7733.0, 'node_y': 1336.0}, 'classes': 'UK'}, {'data': {'node_in_tips_6': ' 1', 'node_fontsize': 80, 'node_name_2': 'UK 1', 'node_fontsize_8': 80, 'node_meta_7': 1, 'node_in_tips_7': ' 1', 'node_name_5': 'UK 1', 'node_meta_3': 1, 'node_in_tips_3': ' 1', 'node_fontsize_3': 80, 'node_name_8': 'UK 1', 'mile': 2, 'node_root_dates_7': '45.06315299999999, 29.258024, 30.693970999999994', 'node_in_ns_5': ' 0', 'node_name': 'UK 1', 'node_name_3': 'UK 1', 'node_all_tips_8': ' 1', 'node_meta_8': 1, 'node_root_dates_4': '29.258024, 30.693970999999994', 'node_in_tips_8': ' 1', 'node_in_ns_8': ' 0', 'node_all_tips_3': ' 1', 'node_root_dates_8': '45.06315299999999, 29.258024, 30.693970999999994', 'node_roots_4': 'ERR5412066, SRR6045506', 'node_size_7': 200, 'node_all_tips_4': ' 1', 'node_size_2': 200, 'node_all_tips_7': ' 1', 'node_in_ns_4': ' 0', 'node_all_tips_5': ' 1', 'node_all_tips': ' 1', 'node_meta_5': 1, 'node_roots_6': 'ERR459798, ERR5412066, SRR6045506', 'node_roots_5': 'ERR5412066, SRR6045506', 'node_size_6': 200, 'node_in_ns_7': ' 0', 'node_size_8': 200, 'node_fontsize_5': 80, 'node_fontsize_4': 80, 'node_root_dates_6': '45.06315299999999, 29.258024, 30.693970999999994', 'node_in_ns': ' 0', 'node_name_6': 'UK 1', 'node_in_tips_5': ' 1', 'node_root_dates': '45.06315299999999, 29.258024, 30.693970999999994', 'node_size_3': 200, 'node_size': 200, 'node_size_5': 200, 'node_root_dates_3': '29.258024, 30.693970999999994', 'node_roots': 'ERR459798, ERR5412066, SRR6045506', 'node_root_dates_2': '29.258024', 'node_fontsize_7': 80, 'node_name_4': 'UK 1', 'node_meta_6': 1, 'node_size_4': 200, 'node_roots_8': 'ERR459798, ERR5412066, SRR6045506', 'node_in_tips': ' 1', 'node_root_id': 'ERR5412066', 'node_meta_4': 1, 'node_all_tips_6': ' 1', 'node_name_7': 'UK 1', 'node_all_tips_2': ' 1', 'node_in_ns_3': ' 0', 'node_root_date': 29.258024, 'node_in_ns_6': ' 0', 'node_root_dates_5': '29.258024, 30.693970999999994', 'node_fontsize_6': 80, 'node_roots_7': 'ERR459798, ERR5412066, SRR6045506', 'node_in_ns_2': ' 0', 'node_in_tips_4': ' 1', 'node_roots_2': 'ERR5412066', 'node_fontsize_2': 80, 'node_roots_3': 'ERR5412066, SRR6045506', 'node_in_tips_2': ' 1', 'node_meta': 1, 'id': 11, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 8369.0, 'node_y': 1300.0}, 'classes': 'UK'}, {'data': {'node_in_tips_8': ' 1', 'node_fontsize': 80, 'node_root_dates': '53.245031', 'node_in_ns_8': ' 1', 'node_fontsize_8': 80, 'node_root_dates_8': '53.245031', 'node_size': 200, 'node_name_7': 'USA 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 53.245031, 'node_roots': 'Node_4', 'node_all_tips_7': ' 2', 'node_all_tips': ' 2', 'node_name_8': 'USA 1', 'mile': 7, 'node_fontsize_7': 80, 'node_root_dates_7': '53.245031', 'node_in_ns_7': ' 1', 'node_size_8': 200, 'node_name': 'USA 1', 'node_roots_7': 'Node_4', 'node_all_tips_8': ' 2', 'node_roots_8': 'Node_4', 'node_in_tips': ' 1', 'node_in_ns': ' 1', 'node_root_id': 'Node_4', 'id': 12, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 1372.0, 'node_y': 1900.0}, 'classes': 'USA'}, {'data': {'node_in_tips_8': ' 1', 'node_in_tips_6': ' 1', 'node_fontsize': 80, 'node_in_tips_5': ' 1', 'node_root_dates': '40.005714', 'node_in_ns_8': ' 0', 'node_fontsize_8': 80, 'node_root_dates_8': '40.005714', 'node_root_dates_5': '40.005714', 'node_size': 200, 'node_name_7': 'UK 1', 'node_size_7': 200, 'node_size_5': 200, 'node_in_tips_7': ' 1', 'node_root_date': 40.005714, 'node_name_5': 'UK 1', 'node_in_ns_6': ' 0', 'node_roots': 'ERR5412431', 'node_all_tips_7': ' 1', 'node_all_tips_5': ' 1', 'node_all_tips': ' 1', 'node_name_8': 'UK 1', 'node_roots_6': 'ERR5412431', 'mile': 5, 'node_fontsize_7': 80, 'node_root_dates_7': '40.005714', 'node_in_ns_7': ' 0', 'node_size_6': 200, 'node_fontsize_6': 80, 'node_size_8': 200, 'node_name': 'UK 1', 'node_roots_7': 'ERR5412431', 'node_in_ns_5': ' 0', 'node_fontsize_5': 80, 'node_roots_5': 'ERR5412431', 'node_all_tips_8': ' 1', 'node_roots_8': 'ERR5412431', 'node_in_tips': ' 1', 'node_root_dates_6': '40.005714', 'node_in_ns': ' 0', 'node_name_6': 'UK 1', 'node_root_id': 'ERR5412431', 'node_all_tips_6': ' 1', 'id': 13, 'tip': 1, 'tooltip': 'geo_loc_name_country: UK', 'node_x': 1972.0, 'node_y': 1900.0}, 'classes': 'UK'}, {'data': {'node_in_tips_8': ' 2', 'node_in_tips_6': ' 2', 'node_fontsize': 88, 'node_in_tips_5': ' 2', 'node_root_dates': '35.885995', 'node_in_ns_8': ' 1', 'node_fontsize_8': 88, 'node_root_dates_8': '35.885995', 'node_root_dates_5': '35.885995', 'node_size': 272, 'node_name_7': 'USA 2', 'node_size_7': 272, 'node_size_5': 272, 'node_in_tips_7': ' 2', 'node_root_date': 35.885995, 'node_name_5': 'USA 2', 'node_in_ns_6': ' 1', 'node_roots': 'Node_84', 'node_all_tips_7': ' 2', 'node_all_tips_5': ' 2', 'node_all_tips': ' 2', 'node_name_8': 'USA 2', 'node_roots_6': 'Node_84', 'mile': 5, 'node_fontsize_7': 88, 'node_root_dates_7': '35.885995', 'node_in_ns_7': ' 1', 'node_size_6': 272, 'node_fontsize_6': 88, 'node_size_8': 272, 'node_name': 'USA 2', 'node_roots_7': 'Node_84', 'node_in_ns_5': ' 1', 'node_fontsize_5': 88, 'node_roots_5': 'Node_84', 'node_all_tips_8': ' 2', 'node_roots_8': 'Node_84', 'node_in_tips': ' 2', 'node_root_dates_6': '35.885995', 'node_in_ns': ' 1', 'node_name_6': 'USA 2', 'node_root_id': 'Node_84', 'node_all_tips_6': ' 2', 'id': 14, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 2608.0, 'node_y': 1936.0}, 'classes': 'USA'}, {'data': {'node_in_tips_8': ' 1', 'node_in_tips_6': ' 1', 'node_fontsize': 80, 'node_root_dates': '44.14865399999999', 'node_in_ns_8': ' 0', 'node_fontsize_8': 80, 'node_root_dates_8': '44.14865399999999', 'node_size': 200, 'node_name_7': 'USA 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 44.14865399999999, 'node_in_ns_6': ' 0', 'node_roots': 'SRR30795571', 'node_all_tips_7': ' 1', 'node_all_tips': ' 1', 'node_name_8': 'USA 1', 'node_roots_6': 'SRR30795571', 'mile': 6, 'node_fontsize_7': 80, 'node_root_dates_7': '44.14865399999999', 'node_in_ns_7': ' 0', 'node_size_6': 200, 'node_fontsize_6': 80, 'node_size_8': 200, 'node_name': 'USA 1', 'node_roots_7': 'SRR30795571', 'node_all_tips_8': ' 1', 'node_roots_8': 'SRR30795571', 'node_in_tips': ' 1', 'node_root_dates_6': '44.14865399999999', 'node_in_ns': ' 0', 'node_name_6': 'USA 1', 'node_root_id': 'SRR30795571', 'node_all_tips_6': ' 1', 'id': 15, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 3244.0, 'node_y': 1900.0}, 'classes': 'USA'}, {'data': {'node_in_tips_8': ' 1', 'node_fontsize': 80, 'node_root_dates': '57.54382400000001', 'node_in_ns_8': ' 0', 'node_fontsize_8': 80, 'node_root_dates_8': '57.54382400000001', 'node_size': 200, 'node_name_7': 'USA 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 57.54382400000001, 'node_roots': 'SRR5483266', 'node_all_tips_7': ' 1', 'node_all_tips': ' 1', 'node_name_8': 'USA 1', 'mile': 7, 'node_fontsize_7': 80, 'node_root_dates_7': '57.54382400000001', 'node_in_ns_7': ' 0', 'node_size_8': 200, 'node_name': 'USA 1', 'node_roots_7': 'SRR5483266', 'node_all_tips_8': ' 1', 'node_roots_8': 'SRR5483266', 'node_in_tips': ' 1', 'node_in_ns': ' 0', 'node_root_id': 'SRR5483266', 'id': 16, 'tip': 1, 'tooltip': 'geo_loc_name_country: USA', 'node_x': 5116.0, 'node_y': 1900.0}, 'classes': 'USA'}, {'data': {'node_in_tips_8': ' 1', 'node_fontsize': 80, 'node_root_dates': '53.246252999999996', 'node_in_ns_8': ' 0', 'node_fontsize_8': 80, 'node_root_dates_8': '53.246252999999996', 'node_size': 200, 'node_name_7': 'France 1', 'node_size_7': 200, 'node_in_tips_7': ' 1', 'node_root_date': 53.246252999999996, 'node_roots': 'SRR20982494', 'node_all_tips_7': ' 1', 'node_all_tips': ' 1', 'node_name_8': 'France 1', 'mile': 7, 'node_fontsize_7': 80, 'node_root_dates_7': '53.246252999999996', 'node_in_ns_7': ' 0', 'node_size_8': 200, 'node_name': 'France 1', 'node_roots_7': 'SRR20982494', 'node_all_tips_8': ' 1', 'node_roots_8': 'SRR20982494', 'node_in_tips': ' 1', 'node_in_ns': ' 0', 'node_root_id': 'SRR20982494', 'id': 17, 'tip': 1, 'tooltip': 'geo_loc_name_country: France', 'node_x': 1372.0, 'node_y': 2500.0}, 'classes': 'France'}], 'edges': [{'data': {'source': 0, 'target': 1, 'edge_size_7': 125, 'edge_name_8': '4', 'edge_name': '4', 'edge_size': 125, 'mile': 3, 'edge_name_6': '3', 'edge_size_5': 50, 'edge_name_4': '', 'edge_size_3': 50, 'edge_name_5': '', 'edge_size_4': 50, 'edge_name_7': '4', 'edge_size_8': 125, 'edge_name_3': '', 'edge_size_6': 100}}, {'data': {'source': 0, 'target': 2, 'edge_size_7': 125, 'edge_name_8': '5', 'edge_name': '5', 'edge_size': 150, 'mile': 1, 'edge_name_6': '3', 'edge_name_2': '', 'edge_size_5': 75, 'edge_name_4': '2', 'edge_size_3': 50, 'edge_size_2': 50, 'edge_name_5': '2', 'edge_name_1': '', 'edge_size_4': 75, 'edge_name_7': '4', 'edge_size_8': 150, 'edge_size_1': 50, 'edge_name_3': '', 'edge_size_6': 100}}, {'data': {'source': 0, 'target': 3, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 7, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 0, 'target': 4, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name_6': '', 'edge_name': '', 'edge_size': 50, 'edge_size_6': 50, 'edge_size_5': 50, 'edge_name_5': '', 'mile': 4, 'edge_name_7': '', 'edge_size_8': 50, 'edge_size_4': 50, 'edge_name_4': ''}}, {'data': {'source': 0, 'target': 5, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 0, 'edge_name_6': '', 'edge_name_2': '', 'edge_size_5': 50, 'edge_name_4': '', 'edge_size_3': 50, 'edge_size_2': 50, 'edge_name_5': '', 'edge_name_0': '', 'edge_name_1': '', 'edge_size_4': 50, 'edge_name_7': '', 'edge_size_8': 50, 'edge_size_0': 50, 'edge_size_1': 50, 'edge_name_3': '', 'edge_size_6': 50}}, {'data': {'source': 0, 'target': 6, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 1, 'edge_name_6': '', 'edge_name_2': '', 'edge_size_5': 50, 'edge_name_4': '', 'edge_size_3': 50, 'edge_size_2': 50, 'edge_name_5': '', 'edge_name_1': '', 'edge_size_4': 50, 'edge_name_7': '', 'edge_size_8': 50, 'edge_size_1': 50, 'edge_name_3': '', 'edge_size_6': 50}}, {'data': {'source': 0, 'target': 7, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 7, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 0, 'target': 8, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 7, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 0, 'target': 9, 'edge_name_3': '', 'edge_size_7': 50, 'edge_name_8': '', 'edge_name_6': '', 'edge_name': '', 'edge_size': 50, 'edge_size_6': 50, 'edge_size_5': 50, 'edge_name_5': '', 'mile': 3, 'edge_name_7': '', 'edge_size_8': 50, 'edge_size_4': 50, 'edge_name_4': '', 'edge_size_3': 50}}, {'data': {'source': 0, 'target': 10, 'edge_size_7': 125, 'edge_name_8': '4', 'edge_name': '4', 'edge_size': 125, 'mile': 1, 'edge_name_6': '3', 'edge_name_2': '2', 'edge_size_5': 100, 'edge_name_4': '2', 'edge_size_3': 75, 'edge_size_2': 75, 'edge_name_5': '3', 'edge_name_1': '2', 'edge_size_4': 75, 'edge_name_7': '4', 'edge_size_8': 125, 'edge_size_1': 75, 'edge_name_3': '2', 'edge_size_6': 100}}, {'data': {'source': 0, 'target': 11, 'edge_size_7': 100, 'edge_name_8': '3', 'edge_name': '3', 'edge_size': 100, 'mile': 2, 'edge_name_6': '3', 'edge_name_2': '', 'edge_size_5': 75, 'edge_name_4': '2', 'edge_size_3': 75, 'edge_size_2': 50, 'edge_name_5': '2', 'edge_size_4': 75, 'edge_name_7': '3', 'edge_size_8': 100, 'edge_name_3': '2', 'edge_size_6': 100}}, {'data': {'source': 3, 'target': 12, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 7, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 4, 'target': 13, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name_6': '', 'edge_name': '', 'edge_size': 50, 'edge_size_6': 50, 'edge_size_5': 50, 'edge_name_5': '', 'mile': 5, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 4, 'target': 14, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name_6': '', 'edge_name': '', 'edge_size': 50, 'edge_size_6': 50, 'edge_size_5': 50, 'edge_name_5': '', 'mile': 5, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 4, 'target': 15, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name_6': '', 'edge_name': '', 'edge_size': 50, 'edge_size_6': 50, 'mile': 6, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 7, 'target': 16, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 7, 'edge_name_7': '', 'edge_size_8': 50}}, {'data': {'source': 12, 'target': 17, 'edge_size_7': 50, 'edge_name_8': '', 'edge_name': '', 'edge_size': 50, 'mile': 7, 'edge_name_7': '', 'edge_size_8': 50}}]},
+
+  layout: layoutOptions,
+
+  ready: function(){
+    window.cy = this;
+  }
+});
+
+function addQtips() {
+    cy.filter(function(ele, i, eles) {
+        return ele.isNode() && ele.data('tooltip') !== undefined;
+    } ).qtip({
+        content: function(){
+                var tooltip = '<br><div style="overflow: auto;"><span style="white-space:nowrap;">' + this.data('tooltip') + '</span></div>';
+                if (this.data('node_meta') !== undefined) {
+                    tooltip += '<br><div style="overflow: auto;"><span style="white-space:nowrap;">ids: ' + this.data('node_roots') + '</span></div>';
+                    tooltip += '<br><div style="overflow: auto;"><span style="white-space:nowrap;">dist. to root: ' + this.data('node_root_dates') + '</span></div>';
+                } else {
+                    tooltip += '<br>id: ' + this.data('node_roots') + '<br>';
+                    tooltip += '<br>dist. to root: ' + this.data('node_root_dates') + '<br>';
+                }
+                tooltip += '<br>samples inside: ' + this.data('node_in_tips');
+                tooltip += '<br>total samples in the subtree (inc. trimmed): ' + this.data('node_all_tips');
+                tooltip += '<br>diversification events inside: ' + this.data('node_in_ns');
+                return tooltip;
+            },
+        show: {event: 'mouseover'},
+        hide: {event: 'mouseout'},
+        style: {classes: 'qtip-bootstrap'},
+        position: {at: 'center bottom'}
+    });
+}
+
+cy.minZoom(.001);
+cy.maxZoom(20);
+addQtips();
+
+
+function toImage(){
+    document.getElementById("downloader").href = cy.jpg({ full: false, quality: 1.0, scale: 2}).replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+}
+
+function saveAsSvg() {
+    var svgContent = cy.svg({scale: 1, full: true});
+    var blob = new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"});
+    document.getElementById("downloader_svg").href = URL.createObjectURL(blob);
+}
+
+function fit() {
+    cy.fit();
+}
+
+function resetLayout() {
+    cy.startBatch();
+    cy.layout(layoutOptions).run();
+    if (removed !== undefined) {
+        removed.forEach(function( ele ) {
+            if (ele.data('node_x') !== undefined) {
+                ele.position('x', ele.data('node_x'));
+                ele.position('y', ele.data('node_y'));
+            }
+        });
+    }
+    cy.endBatch();
+}
+
+var years = ['19.4', '25.5788', '29.6746', '30.7527', '35.8232', '40.0197', '46.0985', '64.8306', '72.0372'];
+var slider = document.getElementById("myRange");
+if (slider !== null) {
+    var output = document.getElementById("demo");
+    output.innerHTML = years[slider.value]; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    var removed = cy.collection();
+
+    slider.oninput = function() {
+        var mile = this.value;
+        output.innerHTML = years[mile];
+
+        cy.startBatch();
+        removed.restore();
+        removed = cy.remove("[mile>" + mile + "]");
+        cy.$("").forEach(function( ele ) {
+            if (ele.data('node_name_' + mile) !== undefined) {
+                ele.data('node_name', ele.data('node_name_' + mile));
+            }
+            if (ele.data('node_roots_' + mile) !== undefined) {
+                ele.data('node_roots', ele.data('node_roots_' + mile));
+            }
+            if (ele.data('node_root_dates_' + mile) !== undefined) {
+                ele.data('node_root_dates', ele.data('node_root_dates_' + mile));
+            }
+            if (ele.data('node_fontsize_' + mile) !== undefined) {
+                ele.data('node_fontsize', ele.data('node_fontsize_' + mile));
+            }
+            if (ele.data('node_in_tips_' + mile) !== undefined) {
+                ele.data('node_in_tips', ele.data('node_in_tips_' + mile));
+            }
+            if (ele.data('node_in_ns_' + mile) !== undefined) {
+                ele.data('node_in_ns', ele.data('node_in_ns_' + mile));
+            }
+            if (ele.data('node_all_tips_' + mile) !== undefined) {
+                ele.data('node_all_tips', ele.data('node_all_tips_' + mile));
+            }
+            if (ele.data('node_size_' + mile) !== undefined) {
+                ele.data('node_size', ele.data('node_size_' + mile));
+            }
+            if (ele.data('edge_name_' + mile) !== undefined) {
+                ele.data('edge_name', ele.data('edge_name_' + mile));
+            }
+            if (ele.data('edge_size_' + mile) !== undefined) {
+                ele.data('edge_size', ele.data('edge_size_' + mile));
+            }
+            if (ele.data('node_meta_' + mile) !== undefined) {
+                ele.data('node_meta', ele.data('node_meta_' + mile));
+            } else if (ele.data('node_meta') !== undefined) {
+                ele.removeData('node_meta');
+            }
+        });
+        cy.endBatch();
+    }
+}
+
+function toggleFullScreen() {
+  var elem = document.getElementById("fullscreenDiv");
+  if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+   (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (elem.requestFullScreen) {
+      elem.requestFullScreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullScreen) {
+      elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-resize-small"
+    document.getElementById("fstext").innerHTML = "  Exit full screen"
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    document.getElementById("fsspan").className = "glyphicon glyphicon-fullscreen"
+    document.getElementById("fstext").innerHTML = "  Full screen"
+  }
+}</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+parameter	value
+pastml_version	1.9.34
+character	geo_loc_name_country
+log_likelihood	-10.931744277594355
+log_likelihood_restricted_MAP	-11.618014239365392
+method	MAP
+model	F81
+num_nodes	45
+num_tips	23
+scaling_factor	0.013584285180692096
+smoothing_factor	0
+state_changes_per_avg_branch	0.2550498585031781
+Australia	0.14807781710399096
+Spain	0.1415987508123676
+Taiwan	0.14159873032792966
+Thailand	0.14160002907961
+USA	0.4271246726761018

@@ -1,0 +1,1296 @@
+---
+title: "MAB_eDCCs"
+output: html_notebook
+---
+
+#Heatmap summarizing the global distribution(Fig2E)
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+
+df_raw <- read.csv("Heatmap.csv")
+
+continent_levels <- c("Asia", "Europe", "Oceania", "North America", "South America")
+country_stats <- df_raw %>%
+  group_by(geo_loc_name_country) %>%
+  summarise(
+    total_count = n(),
+    continent = str_trim(first(geo_loc_name_country_continent)) 
+  ) %>%
+  mutate(continent = factor(continent, levels = continent_levels)) %>%
+  arrange(continent, desc(total_count))
+sorted_countries <- country_stats$geo_loc_name_country
+
+df_counts <- df_raw %>%
+  count(lineage, geo_loc_name_country_continent, name = "Count") %>%
+  complete(lineage, geo_loc_name_country_continent, fill = list(Count = 0))
+
+df_counts1 <- df_raw %>%
+  count(lineage, geo_loc_name_country, name = "Count") %>%
+  complete(lineage, geo_loc_name_country, fill = list(Count = 0))
+
+df_counts$geo_loc_name_country_continent <- factor(df_counts$geo_loc_name_country_continent, 
+                                         levels = continent_levels)
+df_counts1$geo_loc_name_country <- factor(df_counts1$geo_loc_name_country, 
+                                                   levels = sorted_countries)
+
+df_counts1$Count[df_counts1$Count == 0] <- NA
+
+desired_lineage_order <- str_sort(unique(df_counts$lineage), numeric = TRUE)
+
+#continent
+ggplot(df_counts, aes(x = geo_loc_name_country_continent, y = lineage, fill = Count)) +
+  geom_tile(color = "white", lwd = 0.5) +
+  coord_fixed() + 
+  scale_fill_gradient(
+    low = "#FFF5E1", 
+    high = "#E69F00",
+    trans = "log10", 
+    na.value = "white", 
+    breaks = c(1, 10, 100, 1000),
+    labels = c("1", "10", "100", "1000")
+  ) +
+  scale_x_discrete(position = "top") + 
+  geom_tile(color = "black", linewidth = 0.1)+
+  scale_y_discrete(limits = rev(desired_lineage_order)) + 
+  theme_minimal() +
+  labs(title = "", x = NULL, y = "", fill = "") +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5, size = 12, color = "black"),
+    axis.text.y = element_text(size = 12, color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, size = 0.1),
+    panel.grid = element_blank()
+  ) -> p1
+p1
+#country
+ggplot(df_counts1, aes(x = geo_loc_name_country, y = lineage, fill = Count)) +
+  geom_tile(color = "white", lwd = 0.5) +
+  coord_fixed() + 
+  scale_fill_gradient(
+    low = "#FFF5E1", 
+    high = "#E69F00",
+    trans = "log10", 
+    na.value = "white", 
+    breaks = c(1, 10, 100, 1000),
+    labels = c("1", "10", "100", "1000")
+  ) +
+  scale_x_discrete(position = "top") + 
+  geom_tile(color = "black", linewidth = 0.1)+
+  scale_y_discrete(limits = rev(desired_lineage_order)) + 
+  theme_minimal() +
+  labs(title = "", x = NULL, y = "", fill = "") +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5, size = 12, color = "black"),
+    axis.text.y = element_text(size = 12, color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, size = 0.1),
+    panel.grid = element_blank()
+  ) -> p2
+p2
+```
+
+#DCCs and eDCCs expansion boxplot(Fig3A)
+```{r}
+read.csv("expansion_boxplot.csv")->df
+library(ggplot2)
+df$Type <- factor(df$Type, levels = c("DCC1","DCC2","DCC3","DCC4","DCC5","DCC6","DCC7",
+                                    "eDCC8","eDCC9","eDCC10","eDCC11","eDCC12","eDCC13","eDCC14",
+                                    "eDCC15","eDCC16","eDCC17","eDCC18","eDCC19","eDCC20",
+                                    "eDCC21","eDCC22","eDCC23","eDCC24","eDCC25","eDCC26","eDCC27",
+                                    "eDCC28","eDCC29","eDCC30","eDCC31","eDCC32","eDCC33","eDCC34",
+                                    "eDCC35","eDCC36","eDCC37","eDCC38"))
+p1<-ggplot(df, aes(
+  x = Type,
+  y = median_time,
+  color = Type1,
+  size = strains
+)) +
+  #geom_point(alpha = 0.99) +
+  geom_errorbar(aes(ymin = low, ymax = up), size = 1, width = 0) +  
+  geom_point(aes(color = Type1, fill = Type1), shape = 21, stroke = 1,size =4) +  
+  #geom_linerange(aes(ymin = low, ymax = up), linewidth = 0.9, alpha = 0.8) +
+  scale_color_manual(values = c("#AA77CC","#437DBB")) +
+  scale_fill_manual(values = c("#E9D5F8","#BDD1E8")) +
+  #scale_size_continuous(range = c(2, 9)) +
+  ylim(1840,2020)+
+  theme_classic() +
+  labs(x = "", y = "Expansion time", title = "") +
+  theme(
+    axis.text.x = element_text(size = 10, color = "black",angle = 45,hjust = 1),
+    axis.text.y = element_text(size = 10, color = "black"),
+    axis.title.x = element_text(size = 10, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 10),
+    axis.title.y = element_text(size = 10, color = "black"),
+    axis.line = element_line(size = 0.5, colour = "black"),
+    axis.ticks = element_line(size = 0.5, colour = "black"),
+    axis.ticks.length = unit(0.3, "cm")
+  ) 
+
+origin_df <- data.frame(
+  Type = c("DCC1","DCC2","DCC3","DCC4","DCC5","DCC6","DCC7",
+           "eDCC8","eDCC9","eDCC10","eDCC11","eDCC12","eDCC13","eDCC14",
+           "eDCC15","eDCC16","eDCC17","eDCC18","eDCC19","eDCC20",
+           "eDCC21","eDCC22","eDCC23","eDCC24","eDCC25","eDCC26","eDCC27",
+           "eDCC28","eDCC29","eDCC30","eDCC31","eDCC32","eDCC33","eDCC34",
+           "eDCC35","eDCC36","eDCC37","eDCC38"),
+  year = c(1862,1860,1846,1985,1975,1949,1958,
+           1939,1955,1991,1960,1940,1927,1956,
+           1994,1980,1979,2012,2006,1987,
+           1975,1975,1962,1995,1925,2008,
+           1954,1969,2006,1983,1977,1993,2014,
+           2007,1997,2009,2014,2007)
+)
+
+origin_df$Type1 <- ifelse(grepl("^eDCC", origin_df$Type), "eDCC", "DCC")
+
+p1 <- p1 +
+  geom_text(
+    data = origin_df,
+    aes(x = Type, y = year),
+    label = "\u2605",              
+    family = "Arial Unicode MS", 
+    colour = "darkgrey",
+    size = 4.5
+  )
+
+p1 <- p1 +
+  geom_vline(
+    xintercept = 7.5,
+    linetype = "dashed",
+    linewidth = 0.6,
+    colour = "grey30"
+  ) 
+
+p1 
+```
+
+#BEAST skyline(Fig3B)
+```{r}
+#DCC1-3
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+df <- read.csv(
+  "DCC1-3.csv",
+  header = TRUE,
+  stringsAsFactors = FALSE
+)
+
+dcc_levels <- paste0("DCC", 1:3)
+df <- df[df$Type %in% dcc_levels, ]
+df$Type <- factor(df$Type, levels = dcc_levels)
+dcc_cols <- c(
+  "DCC1" = "#E3B48C",  
+  "DCC2" = "#3FA38E",
+  "DCC3" = "#437DBB")
+mean_trend <- df %>%
+  group_by(Year_Round = round(year)) %>%
+  summarise(
+    mean_median = mean(mean, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(Year_Round <= 2020)
+
+ggplot(df, aes(x = year, y = median, color = Type, group = Type)) +
+  geom_line(linewidth = 1, alpha = 0.5) +
+  geom_smooth(
+    data = mean_trend,
+    aes(x = Year_Round, y = mean_median),
+    method = "loess",
+    span = 0.25,       
+    se = FALSE,
+    color = "black",
+    linewidth = 1.3,
+    inherit.aes = FALSE
+  )+
+  theme_bw() + 
+  scale_y_log10(name="Effective Population Size",
+                labels = c(expression(1%*%10^5),
+                           expression(1%*%10^6),
+                           expression(1%*%10^7),
+                           expression(1%*%10^8)),
+                #expand = c(0,0),
+                breaks = c(1E+05, 1E+06, 1e+07, 80000000),
+                limits = c(100000, 80000000))+
+  scale_color_manual(values = dcc_cols) +
+  theme_classic() +
+  theme(
+    legend.position = "right",
+    axis.text.x = element_text(size = 23,color="black"),
+    axis.text.y = element_text(size = 23,color="black"),
+    axis.title = element_blank(),
+    axis.line = element_line(size = 1, colour = "black"),
+    axis.ticks = element_line(size = 1, colour = "black"),
+    axis.ticks.length = unit(0.3, "cm")
+  )->p1
+p1
+
+#DCC4-7
+df <- read.csv(
+  "DCC4-7.csv",
+  header = TRUE,
+  stringsAsFactors = FALSE
+)
+
+dcc_levels <- paste0("DCC", 4:7)
+df <- df[df$Type %in% dcc_levels, ]
+df$Type <- factor(df$Type, levels = dcc_levels)
+dcc_cols <- c(
+  "DCC4" = "#E3B48C",
+  "DCC5" = "#AF96C0",  
+  "DCC6" = "#3FA38E",
+  "DCC7" = "#437DBB")
+mean_trend <- df %>%
+  group_by(Year_Round = round(year)) %>%
+  summarise(
+    mean_median = mean(mean, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(Year_Round <= 2020)
+
+ggplot(df, aes(x = year, y = median, color = Type, group = Type)) +
+  geom_line(linewidth = 1, alpha = 0.5) +
+  geom_smooth(
+    data = mean_trend,
+    aes(x = Year_Round, y = mean_median),
+    method = "loess",
+    span = 0.25,      
+    se = FALSE,
+    color = "black",
+    linewidth = 1.3,
+    inherit.aes = FALSE
+  )+
+  theme_bw() + 
+  scale_y_log10(name="Effective Population Size",
+                labels = c(expression(1%*%10^5),
+                           expression(1%*%10^6),
+                           expression(1%*%10^7),
+                           expression(1%*%10^8)),
+                #expand = c(0,0),
+                breaks = c(1E+05, 1E+06, 1e+07, 80000000),
+                limits = c(100000, 80000000))+
+  scale_color_manual(values = dcc_cols) +
+  theme_classic() +
+  scale_x_continuous(name="Year",limits=c(1880, 2018),breaks = seq(1880, 2020, by = 40)) + 
+  theme(
+    legend.position = "right",
+    axis.text.x = element_text(size = 23,color="black"),
+    axis.text.y = element_text(size = 23,color="black"),
+    axis.title = element_blank(),
+    axis.line = element_line(size = 1, colour = "black"),
+    axis.ticks = element_line(size = 1, colour = "black"),
+    axis.ticks.length = unit(0.3, "cm")
+  )->p2
+p2
+
+#eDCC
+df <- read.csv(
+  "eDCC1-7.csv",
+  header = TRUE,
+  stringsAsFactors = FALSE
+)
+
+dcc_levels <- c(paste0("eDCC", 8:14), "eDCC31")
+df <- df[df$Type %in% dcc_levels, ]
+df$Type <- factor(df$Type, levels = dcc_levels)
+dcc_cols <- c(
+  "eDCC8"  = "#E3B48C",
+  "eDCC9"  = "#F3CFC6",
+  "eDCC10" = "#3FA38E",  
+  "eDCC11" = "#8DAAD6",
+  "eDCC12" = "#AF96C0",
+  "eDCC13" = "#6FAFB7",
+  "eDCC14" = "#C6DCF2",
+  "eDCC31" = "#437DBB"
+)
+mean_trend <- df %>%
+  group_by(Year_Round = round(year)) %>%
+  summarise(
+    mean_median = mean(mean, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(Year_Round <= 2020)
+
+ggplot(df, aes(x = year, y = median, color = Type, group = Type)) +
+  geom_line(linewidth = 1, alpha = 0.5) +
+  geom_smooth(
+    data = mean_trend,
+    aes(x = Year_Round, y = mean_median),
+    method = "loess",
+    span = 0.25,      
+    se = FALSE,
+    color = "black",
+    linewidth = 1.3,
+    inherit.aes = FALSE
+  )+
+  scale_x_continuous(name="Year",limits=c(1880, 2018),breaks = seq(1880, 2020, by = 40)) + 
+  theme_bw() + 
+  scale_y_log10(name="Effective Population Size",
+                labels = c(expression(1%*%10^5),
+                           expression(1%*%10^6),
+                           expression(1%*%10^7),
+                           expression(5%*%10^7)),
+                #expand = c(0,0),
+                breaks = c(1E+05, 1E+06, 1e+07, 50000000),
+                limits = c(100000, 30000000))+
+  scale_color_manual(values = dcc_cols) +
+  theme_classic() +
+  theme(
+    legend.position = "right",
+    axis.text.x = element_text(size = 23,color="black"),
+    axis.text.y = element_text(size = 23,color="black"),
+    axis.title = element_blank(),
+    axis.line = element_line(size = 1, colour = "black"),
+    axis.ticks = element_line(size = 1, colour = "black"),
+    axis.ticks.length = unit(0.3, "cm")
+  )->p3
+p3
+```
+
+#Population size and time regression(Fig3C and FigS5A-D)
+```{r}
+#Fig3C
+library(ggplot2)
+library(ggExtra)
+read.csv("year_median.csv")->df
+fit <- lm(log ~ time, df)
+coefficients <- coef(fit)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+r_squared <- summary(fit)$r.squared
+p_value <- summary(fit)$coefficients[2, 4]
+df$Type <- factor(df$Type, levels = c("DCC", "eDCC"))
+scatter_plot <- ggplot(df, aes(x = time, y = log, color =Type)) +
+  geom_point(size = df$log*12,shape =21,aes(color =Type),stroke = 0.5,
+             fill = alpha(c("#AA77CC","#437DBB")[as.numeric(df$Type)], 0.6),) +
+  scale_color_manual(values = c("#AA77CC","#437DBB")) +
+  scale_fill_manual(values = c("#AA77CC","#437DBB")) + 
+  geom_smooth(method = "lm", se = TRUE, color = "black",linewidth = 1,linetype = "dashed",) +
+  labs(x = "Time before present (years)", y = "Population Size(log10)") +
+  #scale_x_continuous(limits = c(1935,2025),breaks=c(seq(1900,2030, by=20))) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.5),  
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    axis.text.x = element_text(size = 24, color = "black"),
+    axis.text.y = element_text(size = 24, color = "black"),
+    axis.title.x = element_text(size = 24, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 24),
+    axis.title.y = element_text(size = 24, color = "black")) 
+scatter_plot
+p <- scatter_plot +
+  annotate("text", x = 29, y = max(df$log) - 0.2, 
+           label = paste0("R² = ", round(r_squared, 2), ", p < 0.001 "),size = 8,color = "black") 
+a<- ggMarginal(p, type = "density", groupColour = F,groupFill = T, alpha =0.7,margins = "both", size = 3.5) 
+p
+
+#FigS5A
+read.csv("TRL_filter_maha.csv")->df
+
+library(ggplot2)
+library(ggpubr)
+library(ggExtra)
+fit <- lm(log ~ Year, df)
+
+coefficients <- coef(fit)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+r_squared <- summary(fit)$r.squared
+p_value <- summary(fit)$coefficients[2, 4]
+
+scatter_plot <- ggplot(df, aes(x = Year, y = log,color =Type)) +
+  geom_point(size = df$log*6,alpha =0.9,shape =21,color ="white",aes(fill =Type),stroke = 0.5) +
+  scale_fill_manual(values = c("#ED7545","#1F4D85")) + 
+  scale_color_manual(values = c("#ED7545","#1F4D85")) +
+  geom_smooth(method = "lm", se = TRUE, color = "black",linewidth = 1,linetype = "dashed",) +
+  labs(x = "Estimated Age (Year)", y = "Population Size(log10)") +
+  #scale_x_continuous(limits = c(1935,2025),breaks=c(seq(1900,2030, by=20))) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.2),  
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),  
+    axis.text.x = element_text(size = 40, color = "black"),
+    axis.text.y = element_text(size = 40, color = "black"),
+    axis.title.x = element_text(size = 40, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 40),
+    axis.title.y = element_text(size = 40, color = "black")) 
+
+scatter_plot
+
+p <- scatter_plot +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.4, 
+           label = paste0("R² = ", round(r_squared, 2), ", p < 0.001 "),size = 12,color = "black") +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.1, 
+           label = paste0("Different Mutation Rate"),size = 12,color = "black")
+
+
+#FigS5B-D
+#USA
+read.csv("all_TRL_USA.csv")->df
+library(ggplot2)
+library(ggpubr)
+library(ggExtra)
+fit <- lm(log ~ Year, df)
+
+coefficients <- coef(fit)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+r_squared <- summary(fit)$r.squared
+p_value <- summary(fit)$coefficients[2, 4]
+
+scatter_plot <- ggplot(df, aes(x = Year, y = log,color =Type)) +
+  geom_point(size = df$log*6,alpha =0.9,shape =21,color ="white",aes(fill =Type),stroke = 0.5) +
+  scale_fill_manual(values = c("#ED7545","#1F4D85")) + 
+  scale_color_manual(values = c("#ED7545","#1F4D85")) +
+  geom_smooth(method = "lm", se = TRUE, color = "black",linewidth = 1,linetype = "dashed",) +
+  labs(x = "Estimated Age (Year)", y = "Population Size(log10)") +
+  #scale_x_continuous(limits = c(1935,2025),breaks=c(seq(1900,2030, by=20))) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.2),  
+    panel.grid.major = element_blank(),  
+    panel.grid.minor = element_blank(),  
+    axis.text.x = element_text(size = 40, color = "black"),
+    axis.text.y = element_text(size = 40, color = "black"),
+    axis.title.x = element_text(size = 40, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 40),
+    axis.title.y = element_text(size = 40, color = "black")) 
+
+scatter_plot
+
+p <- scatter_plot +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.4, 
+           label = paste0("R² = ", round(r_squared, 2), ", p < 0.001 "),size = 12,color = "black") +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.1, 
+           label = paste0("USA"),size = 12,color = "black")
+
+#UK
+read.csv("all_TRL_UK.csv")->df
+library(ggplot2)
+library(ggpubr)
+library(ggExtra)
+fit <- lm(log ~ Year, df)
+
+coefficients <- coef(fit)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+r_squared <- summary(fit)$r.squared
+p_value <- summary(fit)$coefficients[2, 4]
+
+scatter_plot <- ggplot(df, aes(x = Year, y = log,color =Type)) +
+  geom_point(size = df$log*6,alpha =0.9,shape =21,color ="white",aes(fill =Type),stroke = 0.5) +
+  scale_fill_manual(values = c("#ED7545","#1F4D85")) + 
+  scale_color_manual(values = c("#ED7545","#1F4D85")) +
+  geom_smooth(method = "lm", se = TRUE, color = "black",linewidth = 1,linetype = "dashed",) +
+  labs(x = "Estimated Age (Year)", y = "Population Size(log10)") +
+  #scale_x_continuous(limits = c(1935,2025),breaks=c(seq(1900,2030, by=20))) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.2),  
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),  
+    axis.text.x = element_text(size = 40, color = "black"),
+    axis.text.y = element_text(size = 40, color = "black"),
+    axis.title.x = element_text(size = 40, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 40),
+    axis.title.y = element_text(size = 40, color = "black")) 
+
+scatter_plot
+
+p <- scatter_plot +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.4, 
+           label = paste0("R² = ", round(r_squared, 2), ", p < 0.001 "),size = 12,color = "black") +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.1, 
+           label = paste0("UK"),size = 12,color = "black")
+
+#AS
+read.csv("all_TRL_AS.csv")->df
+library(ggplot2)
+library(ggpubr)
+library(ggExtra)
+fit <- lm(log ~ Year, df)
+
+coefficients <- coef(fit)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+r_squared <- summary(fit)$r.squared
+p_value <- summary(fit)$coefficients[2, 4]
+
+scatter_plot <- ggplot(df, aes(x = Year, y = log,color =Type)) +
+  geom_point(size = df$log*6,alpha =0.9,shape =21,color ="white",aes(fill =Type),stroke = 0.5) +
+  scale_fill_manual(values = c("#ED7545","#1F4D85")) + 
+  scale_color_manual(values = c("#ED7545","#1F4D85")) +
+  geom_smooth(method = "lm", se = TRUE, color = "black",linewidth = 1,linetype = "dashed",) +
+  labs(x = "Estimated Age (Year)", y = "Population Size(log10)") +
+  #scale_x_continuous(limits = c(1935,2025),breaks=c(seq(1900,2030, by=20))) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.2),  
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),  
+    axis.text.x = element_text(size = 40, color = "black"),
+    axis.text.y = element_text(size = 40, color = "black"),
+    axis.title.x = element_text(size = 40, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 40),
+    axis.title.y = element_text(size = 40, color = "black")) 
+
+scatter_plot
+
+p <- scatter_plot +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.4, 
+           label = paste0("R² = ", round(r_squared, 2), ", p < 0.001 "),size = 12,color = "black") +
+  annotate("text", x = max(df$Year)-21, y = max(df$log) - 2.1, 
+           label = paste0("Australia"),size = 12,color = "black")
+
+#bryant-TRl
+data <- read.csv("TRL_bryant.csv")
+boxplot_stats <- data %>%
+  group_by(Subtype) %>%
+  summarize(
+    Mean = mean(TRL),
+    MAX= max(TRL),
+    Q1 = quantile(TRL, 0.25),
+    Q3 = quantile(TRL, 0.75),
+    Upper = max(TRL),
+    Lower = min(TRL)
+  )
+write.csv(boxplot_stats,"bryant_TRL.csv")
+
+read.csv("bryant_TRL.csv")->df
+library(ggplot2)
+library(ggpubr)
+library(ggExtra)
+fit <- lm(log ~ Year, df)
+
+coefficients <- coef(fit)
+intercept <- coefficients[1]
+slope <- coefficients[2]
+r_squared <- summary(fit)$r.squared
+p_value <- summary(fit)$coefficients[2, 4]
+
+scatter_plot <- ggplot(df, aes(x = Year, y = log,color =Type)) +
+  geom_point(size = df$log*6,alpha =0.8,shape =21,color ="white",aes(fill =Type),stroke = 0.5) +
+  scale_fill_manual(values = c("#ED7545","#1F4D85")) + 
+  scale_color_manual(values = c("#ED7545","#1F4D85")) +
+  geom_smooth(method = "lm", se = TRUE, color = "black",linewidth = 1,linetype = "dashed",) +
+  labs(x = "Estimated Age (Year)", y = "Population Size(log10)") +
+  #scale_x_continuous(limits = c(1935,2025),breaks=c(seq(1900,2030, by=20))) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.2),  
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),  
+    axis.text.x = element_text(size = 40, color = "black"),
+    axis.text.y = element_text(size = 40, color = "black"),
+    axis.title.x = element_text(size = 40, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 40),
+    axis.title.y = element_text(size = 40, color = "black")) 
+
+scatter_plot
+
+p <- scatter_plot +
+  annotate("text", x = max(df$Year)-45, y = max(df$log) - 2.7, 
+           label = paste0("R² = ", round(r_squared, 2), ", p < 0.001 "),size = 12,color = "black") +
+  annotate("text", x = max(df$Year)-45, y = max(df$log) - 2.5, 
+           label = paste0("Multicenter"),size = 12,color = "black")
+
+```
+
+#lineage heatmap(Fig4A-B)
+```{r}
+#Fig4A
+library(dplyr)
+library(tidyr)
+library(stringr)
+df <- read.csv("all_evolution_pathway.csv", header = TRUE)
+
+df_mean <- df %>%
+  mutate(match = as.numeric(str_remove(match, "%"))) %>%
+  group_by(tree_name, CC_type) %>%
+  summarise(
+    mean_match = mean(match, na.rm = TRUE),
+    .groups = "drop"
+  )
+tree_order <- c("eDCC33","eDCC37","DCC7","eDCC32","eDCC30","eDCC36","eDCC35","DCC6",
+                "eDCC31","DCC3","eDCC34","eDCC38","eDCC28","eDCC25","DCC4","eDCC10",
+                "DCC2","eDCC9","DCC1","eDCC16","eDCC27","eDCC29","eDCC12","eDCC8",
+                "eDCC23","eDCC19","eDCC13","eDCC24","eDCC11","eDCC22","eDCC18","eDCC20",
+                "eDCC26","eDCC15","DCC5","eDCC21","eDCC17","eDCC14","NonDCC")
+
+cc_order <- c("eDCC33","eDCC37","DCC7","eDCC32","eDCC30","eDCC36","eDCC35","DCC6",
+                "eDCC31","DCC3","eDCC34","eDCC38","eDCC28","eDCC25","DCC4","eDCC10",
+                "DCC2","eDCC9","DCC1","eDCC16","eDCC27","eDCC29","eDCC12","eDCC8",
+                "eDCC23","eDCC19","eDCC13","eDCC24","eDCC11","eDCC22","eDCC18","eDCC20",
+                "eDCC26","eDCC15","DCC5","eDCC21","eDCC17","eDCC14")
+
+tree_strains <- df %>%
+  group_by(tree_name) %>%
+  summarise(Strains = max(Strains, na.rm = TRUE)) %>%  
+  mutate(tree_label = paste0(tree_name, " (", Strains, ")"))  
+tree_labels_ordered <- tree_strains %>%
+  filter(tree_name %in% tree_order) %>%
+  arrange(factor(tree_name, levels = tree_order)) %>%
+  pull(tree_label)
+
+cc_order_markers <- paste0(cc_order, "_DefiningSNPs")
+
+df_plot <- expand.grid(
+  tree_name = tree_order,
+  CC_type   = rev(cc_order_markers)
+) %>%
+  left_join(df_mean, by = c("tree_name", "CC_type")) %>%
+  left_join(tree_strains, by = "tree_name") %>%
+  mutate(
+    tree_label = factor(tree_label, levels = rev(tree_labels_ordered)),  
+    CC_type   = factor(CC_type, levels = cc_order_markers),
+    mean_match = ifelse(is.na(mean_match), NA, mean_match)
+  )
+library(ggplot2)
+
+p1 <- ggplot(
+  df_plot,
+  aes(x = CC_type, y = tree_label, fill = mean_match)
+) +
+  coord_fixed() +
+  scale_fill_gradientn(
+    colours = c("white", "#1B7F79"),
+    values  = c(0, 1),
+    breaks  = c(0, 25, 50, 75, 100),
+    labels  = c("0", "25", "50", "75", "100"),
+    na.value = "#BFBFBF",
+    name = "Mean match (%)"
+  )+
+  scale_x_discrete(position = "top") +
+  
+  theme_minimal(base_size = 12) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  geom_tile(color = "black", linewidth = 0.1)+
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 0,
+      vjust = 0,
+      color = "black",
+      size = 7
+    ),
+    axis.text.y = element_text(
+      color = "black",
+      size = 8
+    ),
+    panel.grid = element_blank(),
+    panel.border = element_rect(
+      colour = "black",
+      fill = NA,
+      linewidth = 0.5
+    ),
+    legend.position = "right"
+  )
+p1
+
+#Fig4B
+df <- read.csv("all_match.csv", header = TRUE, stringsAsFactors = FALSE)
+df$Type<- ifelse(grepl("^eDCC", df$tree_name), "eDCC", "DCC")
+sample_order <- c(
+  paste0("DCC", 1:7),
+  paste0("eDCC", 8:38)
+)
+df$tree_name<- factor(df$tree_name, levels = sample_order)
+
+library(ggplot2)
+
+p2 <- ggplot(df, aes(x = tree_name, y = match_per, color = Type, fill = Type)) +
+  stat_boxplot(aes(colour = Type), geom = "errorbar", width = 0.2, linewidth = 0.4) +
+  geom_boxplot(outlier.shape = NA, linewidth = 0.6, alpha = 1, fill = "white", width = 0.4) +
+  geom_boxplot(aes(colour = Type), outlier.shape = NA, linewidth = 0.3, fill = "white", alpha = 1, width = 0.4) +
+  #geom_boxplot(aes(colour = Type1,fill =Type1),outlier.shape = NA,linewidth =0.2,,alpha =0.3,width =0.4) +
+  geom_jitter(size = 0.8,fill = alpha(c("#AA77CC","#437DBB")[as.numeric(as.factor(df$Type))], 0.4),shape = 21, stroke = 0.5, width = 0.18) +
+  
+  scale_color_manual(values = c("#AA77CC","#437DBB")) +
+  scale_fill_manual(values = c("#AA77CC","#437DBB")) +
+  theme_classic() +
+  labs(x = "", y = "Match percentage", title = "") +
+  theme(
+    axis.text.x = element_text(size = 11, color = "black",angle = 45,hjust = 1),
+    axis.text.y = element_text(size = 11, color = "black"),
+    axis.title.x = element_text(size = 11, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 11),
+    axis.title.y = element_text(size = 11, color = "black"),
+    axis.line = element_line(size = 1, colour = "black"),
+    axis.ticks = element_line(size = 1, colour = "black"),
+    axis.ticks.length = unit(0.3, "cm")
+  ) 
+p2
+
+```
+
+# Gene positive selection in MAB(Fig5A-B)
+```{r}
+library(ggplot2)
+library(dplyr)
+library(scatterpie)
+library(patchwork) 
+library(tidyr) 
+#DCC
+data <- read.csv("positive_selection.csv") 
+data$Total <- data$NS + data$S
+gene_sum_order <- data %>%
+  group_by(gene) %>%
+  summarise(GrandTotal = sum(Total)) %>%
+  arrange(desc(GrandTotal)) 
+sorted_genes <- gene_sum_order$gene
+plot_data <- data %>% filter(Total > 0)
+plot_data$gene <- factor(plot_data$gene, levels = sorted_genes)
+plot_data$type <- factor(plot_data$type, levels = c("eDCC31","eDCC14","eDCC13","eDCC12","eDCC11","eDCC10","eDCC9","eDCC8","DCC7","DCC6","DCC5","DCC4","DCC3","DCC2","DCC1"))
+
+plot_data$x_num <- as.numeric(plot_data$gene)
+plot_data$y_num <- as.numeric(plot_data$type)
+
+max_radius_size <- 0.48 
+threshold <- 30   
+min_radius <- 0.15 
+
+plot_data$radius <- min_radius +
+  (sqrt(pmin(plot_data$Total, threshold)) / sqrt(threshold)) *
+  (max_radius_size - min_radius)
+ggplot() +
+  geom_scatterpie(data = plot_data, 
+                  aes(x = x_num, y = y_num, r = radius),
+                  cols = c("NS", "S"), 
+                  color = "white", 
+                  size =0,
+                  alpha = 1) +
+  coord_fixed() +
+  scale_x_continuous(breaks = 1:length(levels(plot_data$gene)), 
+                     labels = levels(plot_data$gene),
+                     position = "top",
+                     expand = c(0, 0.1) ) + 
+  scale_y_continuous(
+    breaks = 1:length(levels(plot_data$type)), 
+    labels = levels(plot_data$type),
+    expand = c(0, 0.6)
+  ) +
+  scale_fill_manual(values = c("NS" = "#7BADB5", "S" = "#DBB590"),
+                    name = "Mutation Type") +
+  theme_minimal(base_size = 14) + 
+  theme(
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text.x.top = element_text(angle = 90, vjust = 0.1, hjust = 1, 
+                                   size = 6, color = "black"),
+    axis.text.y = element_text(size = 6, color = "black"),
+    legend.position = "",
+    plot.margin = margin(t = 5, r = 5, b = 0, l = 5)
+  ) ->p1
+p1
+
+bar_data <- data %>%
+  group_by(gene) %>%
+  summarise(NS = sum(NS), S = sum(S)) %>%
+  pivot_longer(cols = c("NS", "S"), names_to = "Mutation_Type", values_to = "Count")
+
+bar_data$gene <- factor(bar_data$gene, levels = sorted_genes)
+bar_data$x_num <- as.numeric(bar_data$gene)
+bar_data$Mutation_Type <- factor(bar_data$Mutation_Type, levels = c("S","NS"))
+
+p2 <- ggplot(bar_data, aes(x = x_num, y = Count, fill = Mutation_Type)) +
+  geom_bar(stat = "identity", width = 0.7) + # width 控制柱子宽度，0.7 比较美观
+  
+  scale_fill_manual(values = c("NS" = "#7BADB5", "S" = "#DBB590"), 
+                    name = "Mutation Type") +
+
+  scale_x_continuous(
+    expand = c(0, 0.1),
+    breaks = 1:length(levels(bar_data$gene)),
+    labels = NULL 
+  ) +
+  
+  scale_y_continuous(
+    expand = c(0, 0.6) 
+  ) +
+  
+  theme_minimal(base_size = 14) +
+  labs(y = "") +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(), 
+    axis.line.y = element_line(color = "black", size = 0.3),
+    axis.ticks.y = element_line(color = "black", size = 0.3),
+    axis.text.y = element_text(color = "black",size = 6),
+    plot.margin = margin(t = -2, r = 5, b = 10, l = 5),
+    legend.position = ""    
+  )
+p2
+
+combined_plot <- p1 / p2 + plot_layout(heights = c(4, 2))
+
+print(combined_plot)
+
+#IGR
+library(ggplot2)
+library(dplyr)
+library(scatterpie)
+library(tidyr)    
+library(tidyverse)
+
+data <- read.csv("IGR.csv")
+gene_sum_order <- data %>%
+  group_by(IGR) %>%
+  summarise(GrandTotal = sum(count)) %>%
+  arrange(desc(GrandTotal))
+gene_sum_order$IGR <- factor(gene_sum_order$IGR, levels = gene_sum_order$IGR)
+
+p3 <- ggplot(gene_sum_order, aes(x = IGR, y = GrandTotal)) +
+  geom_col(width = 0.7, fill = "#9A8FB5") +  
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  theme_minimal(base_size = 14) +
+  labs(y = "") +
+  theme(
+    panel.grid = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1, size = 10, color = "black"), 
+    axis.line.y = element_line(color = "black", size = 0.5),
+    axis.ticks.y = element_line(color = "black", size = 0.5),
+    axis.line.x = element_line(color = "black", size = 0.5),  
+    axis.text.y = element_text(color = "black", size = 11),
+    plot.margin = margin(t = 5, r = 5, b = 10, l = 20),
+    legend.position = "none"
+  )
+
+p3
+```
+
+#Host status, subspecies distribution, sample source bar graph(FigS1A-C)
+```{r}
+#Host status
+library(ggplot2)
+data <- data.frame(
+  Type = c("CF", "Non-CF"),
+  Count = c(1495, 410)
+)
+data$Percentage <- data$Count / sum(data$Count) * 100
+data$Type = factor(data$Type, levels=c("CF", "Non-CF"))
+colors <- c("#456FBB","#61ACA2", "#F0C96E")
+p1 <- ggplot(data, aes(x = Type, y = Percentage, fill = Type)) +
+  geom_bar(stat = "identity", color = "black",alpha =1,width = 0.7) +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), vjust = -0.5,size = 10) +
+  scale_fill_manual(values = colors) +
+  scale_y_continuous(expand = c(0, 0),limits = c(0,88)) +
+  labs(x = "",
+       y = "Percentage") +
+  theme_classic() +
+  theme(#axis.text.x = element_text(size = 28,color="black"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_text(size = 28,color="black"),
+    axis.title.x = element_text(size = 15,color="black"),
+    axis.title.y = element_text(size = 28,color="black"),
+    legend.position = "",
+    axis.line.x = element_line(color = "black", size = 1.2), 
+    axis.line.y = element_line(color = "black", size = 1.2),  
+    axis.ticks.length = unit(0.1, "cm"), 
+    axis.ticks = element_line(color = "black", size = 1.2),
+    panel.spacing.x = unit(0, "pt")) 
+p1
+
+#Subspecies distribution
+library(ggplot2)
+data <- data.frame(
+  Type = c("ABS", "MAS", "BOL"),
+  Count = c(6596, 2417, 506)
+)
+data$Percentage <- data$Count / sum(data$Count) * 100
+data$Type = factor(data$Type, levels=c("ABS", "MAS", "BOL"))
+colors <- c("#456FBB","#61ACA2", "#F0C96E")
+p2 <- ggplot(data, aes(x = Type, y = Percentage, fill = Type)) +
+  geom_bar(stat = "identity", color = "black",alpha =1,width = 0.7) +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), vjust = -0.5,size = 10) +
+  scale_fill_manual(values = colors) +
+  scale_y_continuous(expand = c(0, 0),limits = c(0,79)) +
+  labs(x = "",
+       y = "Percentage") +
+  theme_classic() +
+  theme(#axis.text.x = element_text(size = 28,color="black"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_text(size = 28,color="black"),
+    axis.title.x = element_text(size = 15,color="black"),
+    axis.title.y = element_text(size = 28,color="black"),
+    legend.position = "",
+    axis.line.x = element_line(color = "black", size = 1.2), 
+    axis.line.y = element_line(color = "black", size = 1.2), 
+    axis.ticks.length = unit(0.1, "cm"), 
+    axis.ticks = element_line(color = "black", size = 1.2),
+    panel.spacing.x = unit(0, "pt")) 
+p2
+
+#Sample source 
+library(ggplot2)
+data <- data.frame(
+  Type = c("IPS","EPS","ENS"),
+  Count = c(2341, 312, 46)
+)
+data$Percentage <- data$Count / sum(data$Count) * 100
+data$Type = factor(data$Type, levels=c("IPS","EPS","ENS"))
+colors <- c("#456FBB","#61ACA2", "#F0C96E")
+p3 <- ggplot(data, aes(x = Type, y = Percentage, fill = Type)) +
+  geom_bar(stat = "identity", color = "black",alpha =1,width = 0.7) +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), vjust = -0.5,size = 10) +
+  scale_fill_manual(values = colors) +
+  scale_y_continuous(expand = c(0, 0),limits = c(0,95)) +
+  labs(x = "",
+       y = "Percentage") +
+  theme_classic() +
+  theme(#axis.text.x = element_text(size = 28,color="black"),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 28,color="black"),
+        axis.title.x = element_text(size = 15,color="black"),
+        axis.title.y = element_text(size = 28,color="black"),
+        legend.position = "",
+        axis.line.x = element_line(color = "black", size = 1.2), 
+        axis.line.y = element_line(color = "black", size = 1.2), 
+        axis.ticks.length = unit(0.1, "cm"), 
+        axis.ticks = element_line(color = "black", size = 1.2),
+        panel.spacing.x = unit(0, "pt")) 
+p3
+
+```
+
+#Rarefaction(FigS1D-E)
+```{r}
+library(dplyr)
+library(ggplot2)
+
+results <- read.csv("eDCC_subsamples_repeated.csv")
+
+summary_results <- results %>%
+  group_by(SampleSize) %>%
+  summarize(
+    AvgRepeatedValuesCount = mean(RepeatedValuesCount),
+    Avgper = mean(Per)
+  )
+
+ggplot(results, aes(x = factor(SampleSize))) +
+  geom_boxplot(aes(y = RepeatedValuesCount), fill = "#3A845D",color = "#3A845D", alpha = 0.5, width = 0.3) +
+  geom_boxplot(aes(y = Per * max(results$RepeatedValuesCount) / max(results$Per)), fill = "#5043A4",color = "#5043A4", alpha = 0.5, width = 0.3) +
+  geom_smooth(aes(y = RepeatedValuesCount, group = 1), method = "loess", se = TRUE, linetype = "solid", color = "#3A845D",linewidth = 1.3) +
+  geom_smooth(aes(y = Per * max(results$RepeatedValuesCount) / max(results$Per), group = 1), 
+              method = "loess", se = TRUE, linetype = "solid", color = "#5043A4",linewidth = 2) +
+  scale_y_continuous(
+    name = "Number of Cluster Counts",
+    sec.axis = sec_axis(~ . * max(results$Per) / max(results$RepeatedValuesCount), 
+                        name = "Percentage of Uncluster Values")
+  ) +
+  theme_bw() +
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 1.2),  
+    #panel.grid.major = element_blank(),  
+    panel.grid.minor = element_blank(), 
+    axis.text.x = element_text(size = 26, color = "black"),
+    axis.text.y = element_text(size = 26, color = "black"),
+    axis.title.x = element_text(size = 26, color = "black"),
+    legend.position = "none",
+    strip.text = element_text(size = 26),
+    axis.title.y = element_text(size = 26, color = "black"),
+    plot.margin = margin(1, 1, 1, 1, "cm")) +
+  labs(title = "",
+       x = "Sample Size") -> plot
+
+print(plot)
+```
+
+#Recombination patterns of clade-defining SNPs(FigS7)
+```{r}
+#ABS
+library(tidyverse)
+
+type_df <- read.csv("../ABS_type.csv", stringsAsFactors = FALSE)
+colnames(type_df) <- c("strain", "Type")
+
+type_order <- c(
+  "eDCC28","eDCC25","DCC4","eDCC10","DCC2","eDCC9","DCC1","eDCC16",
+  "eDCC27","eDCC29","eDCC12","eDCC8","eDCC23","eDCC19","eDCC13",
+  "eDCC24","eDCC11","eDCC22","eDCC18","eDCC20","eDCC26","eDCC15",
+  "DCC5","eDCC21","eDCC17","eDCC14","NonDCC"
+)
+
+cc_dirs <- list.dirs(path = ".", recursive = FALSE)
+
+for (cc in cc_dirs) {
+  
+  message("Processing ", cc)
+  
+  matrix_file <- file.path(cc, "matrix.tsv")
+  if (!file.exists(matrix_file)) next
+  
+  df <- read.delim(matrix_file, check.names = FALSE)
+  
+  mat <- df %>%
+    column_to_rownames("target_site") %>%
+    as.matrix() %>%
+    t() %>%
+    as.data.frame()
+  
+  mat$strain <- rownames(mat)
+
+  mat <- mat %>%
+    left_join(type_df, by = "strain")
+  
+  mat$Type <- factor(mat$Type, levels = type_order)
+
+  df_long <- mat %>%
+    pivot_longer(
+      cols = -c(strain, Type),
+      names_to = "target_site",
+      values_to = "value"
+    )
+  
+  df_long$value[df_long$value == 0] <- NA
+  
+  df_long <- df_long %>%
+    arrange(Type, strain)
+  
+  #plot
+  p <- ggplot(
+    df_long,
+    aes(x = target_site, y = strain, fill = factor(value))
+  ) +
+    geom_tile(color = NA) +
+    scale_fill_manual(
+      values = c("1" = "#A50026"),
+      na.value = "grey95",
+      guide = "none"
+    ) +
+    facet_grid(
+      Type ~ .,
+      scales = "free_y",
+      space  = "free_y"
+    ) +
+    theme_minimal(base_size = 5) +
+    theme(
+      axis.text.x  = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid   = element_blank(),
+      strip.text.y = element_text(angle = 0, size = 8),
+      strip.background = element_rect(fill = "grey95", color = NA)
+    ) +
+    labs(x = "", y = "")
+  png(
+    filename = file.path(cc, paste0(basename(cc), ".png")),
+    width = 12,
+    height = 6,
+    units = "in",
+    bg = "white",
+    res = 300
+  )
+  print(p)
+  dev.off()
+}
+
+#MAS
+library(tidyverse)
+type_df <- read.csv("../MAS_type.csv", stringsAsFactors = FALSE)
+colnames(type_df) <- c("strain", "Type")
+
+type_order <- c(
+  "eDCC33","eDCC37","DCC7","eDCC32","eDCC30","eDCC36",
+  "eDCC35","DCC6","eDCC31","DCC3","eDCC34","NonDCC"
+)
+
+cc_dirs <- list.dirs(path = ".", recursive = FALSE)
+
+for (cc in cc_dirs) {
+  message("Processing ", cc)
+  matrix_file <- file.path(cc, "matrix.tsv")
+  if (!file.exists(matrix_file)) next
+  df <- read.delim(matrix_file, check.names = FALSE)
+  mat <- df %>%
+    column_to_rownames("target_site") %>%
+    as.matrix() %>%
+    t() %>%
+    as.data.frame()
+  
+  mat$strain <- rownames(mat)
+  mat <- mat %>%
+    left_join(type_df, by = "strain")
+  mat$Type <- factor(mat$Type, levels = type_order)
+  df_long <- mat %>%
+    pivot_longer(
+      cols = -c(strain, Type),
+      names_to = "target_site",
+      values_to = "value"
+    )
+  
+  df_long$value[df_long$value == 0] <- NA
+  
+  df_long <- df_long %>%
+    arrange(Type, strain)
+  #plot
+  p <- ggplot(
+    df_long,
+    aes(x = target_site, y = strain, fill = factor(value))
+  ) +
+    geom_tile(color = NA) +
+    scale_fill_manual(
+      values = c("1" = "#A50026"),
+      na.value = "grey95",
+      guide = "none"
+    ) +
+    facet_grid(
+      Type ~ .,
+      scales = "free_y",
+      space  = "free_y"
+    ) +
+    theme_minimal(base_size = 5) +
+    theme(
+      axis.text.x  = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid   = element_blank(),
+      strip.text.y = element_text(angle = 0, size = 8),
+      strip.background = element_rect(fill = "grey95", color = NA)
+    ) +
+    labs(x = "", y = "")
+  png(
+    filename = file.path(cc, paste0(basename(cc), ".png")),
+    width = 10,
+    height = 3.5,
+    units = "in",
+    bg = "white",
+    res = 300
+  )
+  print(p)
+  dev.off()
+}
+
+```
+
+#Unfixed mutations(FigS8)
+```{r}
+library(tidyverse)
+library(ggplot2)
+df <- read.csv("all_unfix.csv", header = TRUE)
+df <- df %>%
+  arrange(desc(count))
+df_long <- df %>%
+  pivot_longer(
+    cols = c(NS, S),
+    names_to = "Mutation_Type",
+    values_to = "Count"
+  )
+df_long$target_gene <- factor(df_long$target_gene,
+                              levels = df$target_gene)
+#plot
+ggplot(df_long, aes(x = target_gene, y = Count, fill = Mutation_Type)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  scale_fill_manual(
+    values = c(
+      "NS" = "#F2713B",
+      "S"  = "#476FB4"
+    )) +
+  labs(
+    x = "Gene",
+    y = "Unfixed Mutations"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    text = element_text(family = "Arial"),
+    axis.text.x = element_text(angle = 60, hjust = 1),
+    axis.line = element_line(size = 0.6),
+    axis.ticks = element_line(size = 0.6)
+  )
+```
+
+#Distribution of nonsynonymous mutation counts per isolate(FigS10A-C)
+```{r}
+#FigS10A-B
+library(tidyverse)
+library(tidyverse)
+library(ggpubr)
+library(patchwork)
+
+df <- read.csv("all_mutations_distribution.csv")
+df$group <- factor(df$group, levels=c("A","B"))
+theme_pnas <- theme_classic(base_size = 14) +
+  theme(
+    axis.line = element_line(size=0.6),
+    axis.ticks = element_line(size=0.6),
+    text = element_text(family="Arial"),
+    legend.position=""
+  )
+#plot
+plot_group <- function(sub_df){
+  ggplot(sub_df, aes(x=count, fill=group)) +
+    geom_histogram(binwidth=1, color="black", alpha=0.5, position="identity") +
+    geom_density(aes(y=..count..), lwd = 1.2, alpha=0.3, color="black", size=1, adjust=1.6) + 
+    scale_fill_manual(values=c("#4DBBD5","#E64B35")) +
+    scale_x_continuous(breaks = seq(min(sub_df$count), max(sub_df$count), by=1)) +
+    labs(
+      x="Mutation count",
+      y="Number of isolates",
+      fill="Group"
+    ) +
+    theme_pnas
+}
+
+pA <- plot_group(df %>% filter(group=="A"))
+pB <- plot_group(df %>% filter(group=="B"))
+
+fig <- pA / pB + plot_annotation(tag_levels="A")
+fig
+
+#FigS10C
+library(tidyverse)
+library(ggpubr)
+
+df <- read.csv("all_mutations_distribution.csv")
+df$group <- factor(df$group, levels=c("A","B"))
+theme_pnas <- theme_classic(base_size = 14) +
+  theme(
+    axis.line = element_line(size=0.6),
+    axis.ticks = element_line(size=0.6),
+    text = element_text(family="Arial"),
+    legend.position="top"
+  )
+
+#Wilcoxon p
+p_val <- wilcox.test(count ~ group, data=df)$p.value
+p_val_label <- paste0("p = ", signif(p_val, 3))
+#plot
+ggplot(df, aes(x=count, fill=group, color=group)) +
+  geom_density(aes(y = ..density.. * 100), alpha=0.3, size=1, adjust=1.6) +
+  scale_x_continuous(breaks = seq(min(df$count), max(df$count), by=1)) +
+  scale_y_continuous(labels = function(x) paste0(round(x,1), "%")) +
+  scale_fill_manual(
+    values=c("#4DBBD5","#E64B35"),
+    labels=c("DCC1-3","Others") 
+  ) +
+  scale_color_manual(
+    values=c("#4DBBD5","#E64B35"),
+    labels=c("DCC1-3","Others") 
+  ) +
+  labs(
+    x="Mutation count",
+    y="Density",
+    fill="Group",
+    color="Group"
+  ) +
+  theme_pnas +
+  annotate("text", 
+           x = 5, 
+           y = 30,  
+           label = p_val_label, size=5)
+
+```
