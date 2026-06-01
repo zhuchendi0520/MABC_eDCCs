@@ -1,90 +1,107 @@
 # MABC_eDCCs
 
-This repository contains scripts and selected input files used to reproduce analyses of the global population structure, evolution, and transmission dynamics of the *Mycobacterium abscessus* complex.
+This repository contains scripts and selected analysis files for the manuscript:
 
-The workflow is organized around major analytical steps from genome processing to phylogenetic and evolutionary analysis, including pan-genome construction, read mapping, recombination-aware SNP processing, clade assignment, pNS estimation, and downstream visualization.
+**Extensive Parallel Global Expansion and Ongoing Adaptive Evolution of *Mycobacterium abscessus***
 
-## Repository structure
+The study analyzes global whole-genome sequencing data from the *Mycobacterium abscessus* complex (MAB) to identify dominant circulating clones (DCCs), emerging DCCs (eDCCs), their geographic spread, temporal expansion, clade assignment markers, and genes under recent adaptive selection.
+
+## Repository overview
 
 ```text
 MABC_eDCCs/
-├── data/
-│   ├── BEAST/                         BEAST XML, posterior tree, and MCC tree files
-│   ├── Gubbins FASTA/                 Recombination-filtered polymorphic-site FASTA files
-│   └── Phylogenetic trees/            Subspecies trees and PastML ancestral-state results
-└── scripts/
-    ├── 1_Pan_genome_pipline/          Panaroo and Gubbins batch scripts
-    ├── 2_MAB_mapping/                 Reference genomes, repeat masks, and BWA-MEM mapping scripts
-    ├── 3_pNS/                         SNP annotation formatting and gene-level pNS scripts
-    ├── 4_MAB_gene_translate/          Gene annotation and translation helper scripts
-    ├── 5_lineage_assign_cns/          Subspecies-specific lineage assignment scripts
-    └── 6_R_script/                    R Markdown analysis and plotting workflow
+|-- data/
+|   |-- BEAST/
+|   |-- Gubbins FASTA/
+|   `-- Phylogenetic trees/
+`-- scripts/
+    |-- 1_Pan_genome_pipline/
+    |-- 2_MAB_mapping/
+    |-- 3_pNS/
+    |-- 4_MAB_gene_translate/
+    |-- 5_lineage_assign_cns/
+    `-- 6_R_script/
 ```
 
-## Main workflow
+## Data directories
 
-1. Build and filter the pan-genome using the scripts in `scripts/1_Pan_genome_pipline/`.
-2. Map sequencing reads to the relevant *M. abscessus* complex reference genome with the scripts in `scripts/2_MAB_mapping/`.
-3. Detect and filter recombination with Gubbins. Filtered polymorphic-site FASTA files are stored in `data/Gubbins FASTA/`.
-4. Assign lineages using the subspecies-specific SNP marker scripts in `scripts/5_lineage_assign_cns/`.
-5. Estimate gene-level pNS values from annotated SNP tables using `scripts/3_pNS/`.
-6. Run downstream statistical analysis and visualization with `scripts/6_R_script/abscessus_analyze.Rmd`.
+- `data/BEAST/`: BEAST XML files, posterior tree files, and summarized tree files used for temporal reconstruction and demographic inference of DCC and eDCC lineages.
+- `data/Gubbins FASTA/`: recombination-filtered polymorphic-site FASTA files generated after core-genome alignment and Gubbins filtering. These files are used for clade-level phylogenetic reconstruction.
+- `data/Phylogenetic trees/`: phylogenetic trees for the three MAB subspecies and PastML-related phylogeographic reconstruction results.
 
-## pNS analysis
+## Script directories
 
-The pNS workflow estimates the ratio of observed nonsynonymous to synonymous mutations after correcting for the expected nonsynonymous and synonymous mutation opportunities under a mutation spectrum model.
+### `scripts/1_Pan_genome_pipline/`
 
-Relevant scripts:
+Scripts in this directory are used for clade-level core-genome construction and recombination filtering, corresponding to the manuscript sections on DCC/eDCC core-genome phylogenies.
 
-- `scripts/3_pNS/format-snppar.py`: converts SNP annotation output into the CSV format required by the pNS script.
-- `scripts/3_pNS/pNS.py`: original gene-level pNS calculation script.
-- `scripts/3_pNS/pNS_setsynto1.py`: modified pNS script that sets the synonymous count to 1 when a gene has no observed synonymous mutation, preventing division by zero for genes with nonsynonymous-only mutations.
+- `panaroo.sl`: SLURM workflow for annotating assemblies with Prokka and building core-genome alignments with Panaroo. The script takes a sample list, runs Prokka in parallel, and then runs Panaroo in strict mode to generate a core-gene alignment.
+- `gubbins.sl`: SLURM script for running Gubbins on Panaroo core-genome alignments. This step detects and removes recombinant regions before downstream phylogenetic reconstruction.
 
-Example usage:
+### `scripts/2_MAB_mapping/`
 
-```bash
-python scripts/3_pNS/format-snppar.py snp_annotation.txt > sample_ann.csv
-python scripts/3_pNS/pNS_setsynto1.py sample_ann.csv
-```
+Scripts and reference files in this directory are used for read mapping and SNP calling against subspecies-specific MAB reference genomes, corresponding to the manuscript Methods sections on SNP calling and repetitive-region filtering.
 
-The pNS script writes a corresponding `*_gene.csv` output file.
+- `mapping_bwamem.M.abscessus.sh`: generates commands for trimming reads, mapping to the *M. abscessus* reference genome with BWA-MEM, sorting/indexing BAM files, calling SNPs with VarScan, filtering repetitive regions, and extracting fixed SNPs.
+- `mapping_bwamem.MAB.subsp.massiliense.sh`: same mapping and SNP-calling workflow for *M. abscessus* subsp. *massiliense*.
+- `mapping_bwamem.MAB.subsp.bolletii.sh`: same mapping and SNP-calling workflow for *M. abscessus* subsp. *bolletii*.
+- `mapping_bwamem.ATCC19977.sh`: mapping workflow using the ATCC19977 reference.
+- `M.abscessus.fna`, `MAB.subsp.massiliense.fna`, `MAB.subsp.bolletii.fna`: reference genome FASTA files used by the mapping scripts.
+- `*_repeat_PEPPE_phage_transposase.loci*.txt`: repeat-region masks used to exclude SNPs in repetitive loci, phage regions, PE/PPE-like regions, and transposase-associated regions.
 
-## Example pNS output: L3i1.csv
+### `scripts/3_pNS/`
 
-`L3i1.csv` is a gene-level pNS result table generated from annotated SNP data. It contains 3,357 rows, including 3,356 gene entries after excluding the header-like `Gene` row. Across those gene entries, the table summarizes 14,144 coding mutations, including 5,516 synonymous and 8,628 nonsynonymous mutations. A total of 2,913 genes have a finite pNS value.
+Scripts in this directory are used for gene-level pN/pS or pNS analysis, corresponding to the manuscript section on adaptive selection during recent DCC/eDCC expansion.
 
-Columns:
+- `format-snppar.py`: reformats SNPPar annotation output into the input table required by the pNS scripts. It classifies SNPs as synonymous, nonsynonymous, or intergenic and records the wild-type codon.
+- `pNS.py`: original pNS calculation script. It estimates expected synonymous and nonsynonymous mutation opportunities under a codon-level mutation model, then calculates gene-level pNS values.
+- `pNS_setsynto1.py`: modified pNS script used when a gene has no observed synonymous mutation. In that case, the synonymous count is set to 1 to avoid division-by-zero problems while retaining genes with nonsynonymous-only mutations.
+- `pNS_readme.txt`: brief usage note for the pNS scripts.
 
-| Column | Description |
-| --- | --- |
-| `GENE` | Gene identifier, usually an `Rv` locus tag. |
-| `pNS` | Observed pNS value, calculated as `(OBSERVED_NSY / EXPECTED_NSY) / (OBSERVED_SYN / EXPECTED_SYN)`. |
-| `OBSERVED_SYN` | Number of observed synonymous SNPs in the gene. |
-| `OBSERVED_NSY` | Number of observed nonsynonymous SNPs in the gene. |
-| `EXPECTED_SYN` | Expected synonymous mutation count under the codon-level mutation model. |
-| `EXPECTED_NSY` | Expected nonsynonymous mutation count under the codon-level mutation model. |
-| `NEUTRAL_SYN` | Synonymous count sampled from the neutral binomial model. |
-| `NEUTRAL_NSY` | Nonsynonymous count sampled from the neutral binomial model. |
-| `pNS_NEUTRAL` | Neutral pNS value from the simulated synonymous/nonsynonymous counts. |
-| `TOTAL` | Total coding SNP count summarized for the gene. |
+### `scripts/4_MAB_gene_translate/`
 
-Interpretation:
+Scripts and annotation tables in this directory are used to annotate SNPs with gene location and coding consequence, corresponding to the manuscript analyses of synonymous/nonsynonymous mutations and candidate adaptive genes.
 
-- `pNS > 1` indicates an excess of nonsynonymous changes relative to synonymous changes after accounting for expectation.
-- `pNS < 1` indicates fewer nonsynonymous changes than expected relative to synonymous changes.
-- Empty or `NaN` pNS values usually arise when the ratio cannot be computed, for example because one side of the observed or expected ratio is zero.
+- `1_M.abscessus_Annotation.py`: Python SNP annotation script for the *M. abscessus* reference. It maps mutations to genes or intergenic regions, determines codon position, and classifies coding mutations as synonymous or nonsynonymous.
+- `1_M.abscessus_Annotation.pl`: Perl version of the *M. abscessus* SNP annotation script.
+- `1_massiliense_Annotation.pl`: SNP annotation script for subsp. *massiliense*.
+- `1_bolletii_Annotation.pl`: SNP annotation script for subsp. *bolletii*.
+- `2_M.abscessus_20220725`, `2_MAB.subsp.massiliense_20221024`, `2_MAB.subsp.bolletii_20220725`: gene annotation tables used by the annotation scripts.
+- `3_genetic_codes`: codon translation table used to classify mutations as synonymous or nonsynonymous.
 
-## Dependencies
+### `scripts/5_lineage_assign_cns/`
 
-The scripts use a mixture of Python, Perl, R, and external bioinformatics tools. The pNS scripts require:
+Scripts and marker files in this directory implement the evolutionary path-based typing framework described in the manuscript. They assign isolates to DCC/eDCC lineages using clade-defining SNP markers.
 
-- Python 2 syntax for `format-snppar.py`
-- Python with `pandas`, `numpy`, and `scipy` for `pNS.py` and `pNS_setsynto1.py`
+- `subtype_assign_abs_pathway.py`: assigns subsp. *abscessus* isolates to DCC/eDCC lineages by comparing an isolate SNP file against clade-defining SNP markers.
+- `subtype_assign_mas_pathway.py`: same lineage assignment workflow for subsp. *massiliense*.
+- `subtype_assign_bol_pathway.py`: same lineage assignment workflow for subsp. *bolletii*.
+- `typing_SNP_ABS_pathway.txt`: clade-defining SNP marker set for subsp. *abscessus*.
+- `typing_SNP_MAS_pathway.txt`: clade-defining SNP marker set for subsp. *massiliense*.
+- `typing_SNP_BOL_pathway.txt`: clade-defining SNP marker set for subsp. *bolletii*.
+- `trans.py`: helper script for cleaning marker tables by replacing missing reference-base fields with the available base information and writing a tab-delimited output file.
 
-Other workflow steps may require tools such as BWA-MEM, Panaroo, Gubbins, BEAST, and R packages used by `scripts/6_R_script/abscessus_analyze.Rmd`.
+### `scripts/6_R_script/`
+
+This directory contains the R Markdown workflow used to generate summary plots and statistical analyses for the manuscript.
+
+- `abscessus_analyze.Rmd`: R analysis and plotting notebook for manuscript figures and supplementary figures, including global DCC/eDCC distribution heatmaps, expansion-time plots, BEAST skyline summaries, population-size regressions, lineage marker heatmaps, positive-selection plots, sample metadata summaries, rarefaction analyses, recombination pattern plots, unfixed mutation summaries, and nonsynonymous mutation burden comparisons.
+
+## Relationship to the manuscript
+
+The scripts correspond to the main analytical components of the study:
+
+- Genome processing and SNP calling: `scripts/2_MAB_mapping/`
+- Core-genome alignment and recombination filtering: `scripts/1_Pan_genome_pipline/`
+- Subspecies and clade-level phylogenetic analyses: `data/Phylogenetic trees/`, `data/Gubbins FASTA/`
+- Temporal and demographic reconstruction: `data/BEAST/`
+- Evolutionary path-based clade assignment: `scripts/5_lineage_assign_cns/`
+- Mutation annotation and selection analysis: `scripts/3_pNS/`, `scripts/4_MAB_gene_translate/`
+- Manuscript statistical analysis and plotting: `scripts/6_R_script/`
 
 ## Notes
 
-- Paths in batch scripts may need to be adjusted before running on a different cluster or workstation.
-- Large intermediate files, raw sequencing reads, and some derived outputs may not be included in this repository.
-- The pNS implementation was modified from `https://github.com/swisstph/TBRU_serialTB`.
+- Some scripts contain absolute paths from the original analysis environment and should be edited before running on a new system.
+- Several workflows were designed for an HPC/SLURM environment.
+- Raw sequencing reads and large intermediate files are not included in this repository.
+- The pNS implementation was modified from the script in `https://github.com/swisstph/TBRU_serialTB`.
