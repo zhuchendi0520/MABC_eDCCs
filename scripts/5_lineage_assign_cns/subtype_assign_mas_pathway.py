@@ -63,7 +63,7 @@ def calculate_similarity(snp_set, cc_dict):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: script.py <snp_file> <cc_position_file>", file=sys.stderr)
+        print("Usage: script.py <cc_position_file> <snp_file>", file=sys.stderr)
         sys.exit(1)
 
     snp_file = sys.argv[2]  
