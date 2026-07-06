@@ -193,7 +193,7 @@ Sample    Best_match    Match_percentage    Matched/Total_markers    Assignment
 Example:
 
 ```text
-sample01.cns    DCC1    98.52%    (133/135)    DCC1
+sample01.cns    DCC1    100.00%    (819/819)    DCC1
 ```
 
 Field descriptions:
