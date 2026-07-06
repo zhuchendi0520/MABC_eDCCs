@@ -78,7 +78,7 @@ def main():
 
     if best_matches:
         for cc_name, percentage, match_count, total_count in best_matches:
-            if percentage >= 90:
+            if percentage >= 95:
                 category = cc_name
             else:
                 category = "Non_DCC"
@@ -89,4 +89,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
